@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+.project
+.serverless/
+node_modules/
+package-lock.json
+
