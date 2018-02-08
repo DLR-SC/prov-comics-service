@@ -1,4 +1,4 @@
-const fileFormat = require('../model/FileFormats');
+const fileFormat = require('../model/EFileFormats');
 const JSONParser = require('../model/JSONParser');
 const XMLParser = require('../model/XMLParser');
 
