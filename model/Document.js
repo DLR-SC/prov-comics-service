@@ -1,4 +1,5 @@
 const Role = require('./EComponents').EntityRole;
+const AgentType = require('./EComponents').AgentType;
 
 class Document {
     constructor() {
@@ -8,7 +9,17 @@ class Document {
     }
 
     toString() {
-        return 'Document: \n';
+        let filter = (key, value) => {
+            let filterWords = ['parent', 'usage', 'created', 'owner', 'software'];
+            if(filterWords.includes(key)) return 'OBJ> ' + value['id'];
+            else return value;
+        };
+
+        let string = 'Document: \n';
+        string += '-activities: ' + JSON.stringify(this.activities, filter, ' ') + '\n\n';
+        string += '-agents: ' + JSON.stringify(this.agents, filter, ' ') + '\n\n';
+        string += '-entities: ' + JSON.stringify(this.entities, filter, ' ')  + '\n\n';
+        return string;
     }
 
     addActivity(id, startTime, endTime, label) {
@@ -39,19 +50,39 @@ class Document {
         let newEntity = {
             id: id,
             type: type,
-            label: label ? label : '',
-            role: role ? role : Role.UNKNOWN
+            label: label ? label : ''
         };
         this.entities.push(newEntity);
     }
 
-    setEntityRelation(id, role, parentActivity) {
-        let index = this.entities.findIndex(entity => entity.id==id);
-        if(index == -1) 
+    setEntityRelation(entityId, role, parentActivity) {
+        let entityIdx = this.entities.findIndex(entity => entity.id == entityId);
+        let activityIdx = this.activities.findIndex(activity => activity.id == parentActivity);
+        if(entityIdx == -1 || activityIdx == -1) {
+            console.error('Could not find <id> in document!');
             return null;
-        this.entities[index].role = role;
-        this.entities[index].parent = parentActivity;
-        return this.entities[index];
+        }
+        //this.entities[entityIdx].role = role;
+        if(role == Role.CREATION)
+            this.activities[activityIdx].created = this.entities[entityIdx];
+        else if(role == Role.CREATOR)
+            this.activities[activityIdx].usage = this.entities[entityIdx];
+        return this.entities[entityIdx];
+    }
+
+    setAgentRelation(agentId, activityId, role) {
+        let agentIdx = this.agents.findIndex(agent => agent.id == agentId);
+        let activityIdx = this.activities.findIndex(activity => activity.id == activityId);
+        if(agentIdx == -1 || activityIdx == -1) {
+            console.error('Could not find <id> in document!');
+            return null;
+        }
+        if(this.agents[agentIdx].type == AgentType.PERSON || this.agents[agentIdx].type == AgentType.ORGANIZATION)
+            this.activities[activityIdx].owner = this.agents[agentIdx];
+        else if(this.agents[agentIdx].type == AgentType.SOFTWARE_AGENT)
+            this.activities[activityIdx].software = this.agents[agentIdx];
+        //this.agents[agentIdx].role = role ? role : '';
+        return this.agents[agentIdx];
     }
 }
 

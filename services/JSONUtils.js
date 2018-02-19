@@ -1,3 +1,4 @@
+const ProvAttr = require('../model/EComponents').ProvAttributes;
 class JSONUtils {
     constructor() {}
 
@@ -12,6 +13,20 @@ class JSONUtils {
             if(key.match(regex)) return key;
         }
         return null;
+    }
+
+    static resolveQualifiedNames(element, parent, parentKey) {
+        for(let key in element) {
+            if (typeof element[key] == 'object' && element[key]) {
+                this.resolveQualifiedNames(element[key], element, key);
+            } else if(element[key] == ProvAttr.QUALIFIED_NAME){
+                parent[parentKey] = element['$'];
+                break;
+            } else {
+                continue;
+            }
+
+        }
     }
 }
 

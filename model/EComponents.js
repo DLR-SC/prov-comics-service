@@ -14,16 +14,20 @@ const ProvComponent = {
 const ProvAttributes = {
     TYPE: 'prov:type',
     LABEL: 'prov:label',
+    ROLE: 'prov:role',
     START_TIME: 'prov:startTime',
     END_TIME: 'prov:endTime',
     ENTITY: 'prov:entity',
     ACTIVITY: 'prov:activity',
-    TIME: 'prov:time'
+    AGENT: 'prov:agent',
+    TIME: 'prov:time',
+    QUALIFIED_NAME : 'prov:QUALIFIED_NAME'
 };
 
 const AgentType = {
     SOFTWARE_AGENT: 'prov:SoftwareAgent',
-    PERSON: 'prov:Person'
+    PERSON: 'prov:Person',
+    ORGANIZATION: 'prov:Organization'
 };
 
 const EntityRole = {

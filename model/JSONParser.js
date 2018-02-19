@@ -6,12 +6,15 @@ const AgentType = require('./EComponents').AgentType;
 const EntityRole = require('./EComponents').EntityRole;
 const JSONUtils = require('../services/JSONUtils');
 
+//Static private methods
 const prepareDocument = Symbol('prepareDocument');
+const resolveQualifiedNames = Symbol('resolveQualifiedNames');
 const parseActivities = Symbol('parseActivities');
 const parseAgents = Symbol('parseAgents');
 const parseEntities = Symbol('parseEntities');
 const parseUsage = Symbol('parseUsage');
 const parseGeneration = Symbol('parseGeneration');
+const parseAssociation = Symbol('parseAssociation');
 
 class JSONParser extends AParser{
 
@@ -26,11 +29,16 @@ class JSONParser extends AParser{
         this[parseEntities](rawDocMap.get(ProvComp.ENTITY), parsedDoc);
         this[parseUsage](rawDocMap.get(ProvComp.USAGE), parsedDoc);
         this[parseGeneration](rawDocMap.get(ProvComp.GENERATION), parsedDoc);
+        this[parseAssociation](rawDocMap.get(ProvComp.ASSOCIATION), parsedDoc);
 
         return parsedDoc;
     }
 
     static [prepareDocument](rawDocObj) {
+        //Resolve all qualified names
+        JSONUtils.resolveQualifiedNames(rawDocObj, null, null);
+
+        //Create Map Object for easy access
         const rawDocMap = new Map();
         Object.keys(rawDocObj).forEach(key => {
             rawDocMap.set(key, rawDocObj[key]);
@@ -48,8 +56,8 @@ class JSONParser extends AParser{
     static [parseAgents](rawObj, doc) {
         for(let agentId in rawObj) {
             let agent = rawObj[agentId];
-            if(agent[ProvAttr.TYPE] == AgentType.PERSON || agent[ProvAttr.TYPE] == AgentType.SOFTWARE_AGENT) {
-                let type = agent[ProvAttr.TYPE] == AgentType.PERSON ? AgentType.PERSON : AgentType.SOFTWARE_AGENT;
+            if(agent[ProvAttr.TYPE] == AgentType.PERSON || agent[ProvAttr.TYPE] == AgentType.SOFTWARE_AGENT || agent[ProvAttr.TYPE] == AgentType.ORGANIZATION) {
+                let type = agent[ProvAttr.TYPE] == AgentType.SOFTWARE_AGENT ? AgentType.SOFTWARE_AGENT : AgentType.PERSON;
                 let deviceKey = JSONUtils.findKeyInObj('device', agent);
                 doc.addAgent(agentId, type, agent.label, agent[deviceKey]);
             } else throw new Error('Invalid agent type detected, only prov:SoftwareAgent or prov:Person are allowed');
@@ -57,7 +65,7 @@ class JSONParser extends AParser{
         }
     }
 
-    static [parseEntities](rawObj, doc) { //TODO: Parse Owner
+    static [parseEntities](rawObj, doc) {
         for(let inputId in rawObj) {
             let input = rawObj[inputId];
             doc.addEntity(inputId, input[ProvAttr.TYPE], null, input[ProvAttr.LABEL]);
@@ -78,7 +86,12 @@ class JSONParser extends AParser{
         }
     }
 
-    //TODO: Relate Agents with Activity
+    static[parseAssociation](rawObj, doc) {
+        for(let associationId in rawObj) {
+            let association = rawObj[associationId];
+            doc.setAgentRelation(association[ProvAttr.AGENT], association[ProvAttr.ACTIVITY], association[ProvAttr.ROLE]);
+        }
+    }
 
 }
 
