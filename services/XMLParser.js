@@ -1,5 +1,5 @@
-const AParser = require('./AParser');
-const Document = require('./Document');
+const AParser = require('../model/AParser');
+const Document = require('../model/Document');
 
 class XMLParser extends AParser{
     static parse(rawDocument) {

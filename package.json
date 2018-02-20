@@ -17,6 +17,12 @@
   },
   "homepage": "https://github.com/DLR-SC/prov-comics-service#readme",
   "dependencies": {
-    "eslint": "^4.16.0"
+    "eslint": "^4.16.0",
+    "jsdom": "^11.6.2",
+    "moment": "^2.20.1",
+    "raphael": "^2.2.7"
+  },
+  "devDependencies": {
+    "http": "0.0.0"
   }
 }

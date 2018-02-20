@@ -1,6 +1,6 @@
 const fileFormat = require('../model/EFileFormats');
-const JSONParser = require('../model/JSONParser');
-const XMLParser = require('../model/XMLParser');
+const JSONParser = require('../services/JSONParser');
+const XMLParser = require('../services/XMLParser');
 
 function parseProvDocument(rawDocument, format) {
     let document = null;

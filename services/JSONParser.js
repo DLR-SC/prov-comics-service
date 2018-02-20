@@ -1,10 +1,10 @@
-const AParser = require('./AParser');
-const Document = require('./Document');
-const ProvComp = require('./EComponents').ProvComponent;
-const ProvAttr = require('./EComponents').ProvAttributes;
-const AgentType = require('./EComponents').AgentType;
-const EntityRole = require('./EComponents').EntityRole;
-const JSONUtils = require('../services/JSONUtils');
+const AParser = require('../model/AParser');
+const Document = require('../model/Document');
+const ProvComp = require('../model/EComponents').ProvComponent;
+const ProvAttr = require('../model/EComponents').ProvAttributes;
+const AgentType = require('../model/EComponents').AgentType;
+const EntityRole = require('../model/EComponents').EntityRole;
+const JSONUtils = require('./JSONUtils');
 
 //Static private methods
 const prepareDocument = Symbol('prepareDocument');
@@ -56,10 +56,10 @@ class JSONParser extends AParser{
     static [parseAgents](rawObj, doc) {
         for(let agentId in rawObj) {
             let agent = rawObj[agentId];
-            if(agent[ProvAttr.TYPE] == AgentType.PERSON || agent[ProvAttr.TYPE] == AgentType.SOFTWARE_AGENT || agent[ProvAttr.TYPE] == AgentType.ORGANIZATION) {
-                let type = agent[ProvAttr.TYPE] == AgentType.SOFTWARE_AGENT ? AgentType.SOFTWARE_AGENT : AgentType.PERSON;
+            if(agent[ProvAttr.TYPE] === AgentType.PERSON || agent[ProvAttr.TYPE] === AgentType.SOFTWARE_AGENT || agent[ProvAttr.TYPE] === AgentType.ORGANIZATION) {
+                let type = agent[ProvAttr.TYPE] === AgentType.SOFTWARE_AGENT ? AgentType.SOFTWARE_AGENT : AgentType.PERSON;
                 let deviceKey = JSONUtils.findKeyInObj('device', agent);
-                doc.addAgent(agentId, type, agent.label, agent[deviceKey]);
+                doc.addAgent(agentId, type, agent[ProvAttr.LABEL], agent[deviceKey]);
             } else throw new Error('Invalid agent type detected, only prov:SoftwareAgent or prov:Person are allowed');
           
         }
