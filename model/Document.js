@@ -28,7 +28,9 @@ class Document {
                 id: id,
                 startTime: new Date(startTime),
                 endTime: new Date(endTime),
-                label: label ? label : ''
+                label: label ? label : '',
+                owner: {},
+                software: {}
             };
             this.activities.push(newActivity);
         } catch (e) {
@@ -56,33 +58,51 @@ class Document {
     }
 
     setEntityRelation(entityId, role, parentActivity) {
-        let entityIdx = this.entities.findIndex(entity => entity.id == entityId);
-        let activityIdx = this.activities.findIndex(activity => activity.id == parentActivity);
-        if(entityIdx == -1 || activityIdx == -1) {
+        let entityIdx = this.entities.findIndex(entity => entity.id === entityId);
+        let activityIdx = this.activities.findIndex(activity => activity.id === parentActivity);
+        if(entityIdx === -1 || activityIdx === -1) {
             console.error('Could not find <id> in document!');
             return null;
         }
         //this.entities[entityIdx].role = role;
-        if(role == Role.CREATION)
+        if(role === Role.CREATION)
             this.activities[activityIdx].created = this.entities[entityIdx];
-        else if(role == Role.CREATOR)
+        else if(role === Role.CREATOR)
             this.activities[activityIdx].usage = this.entities[entityIdx];
         return this.entities[entityIdx];
     }
 
     setAgentRelation(agentId, activityId, role) {
-        let agentIdx = this.agents.findIndex(agent => agent.id == agentId);
-        let activityIdx = this.activities.findIndex(activity => activity.id == activityId);
-        if(agentIdx == -1 || activityIdx == -1) {
+        let agentIdx = this.agents.findIndex(agent => agent.id === agentId);
+        let activityIdx = this.activities.findIndex(activity => activity.id === activityId);
+        if(agentIdx === -1 || activityIdx === -1) {
             console.error('Could not find <id> in document!');
             return null;
         }
-        if(this.agents[agentIdx].type == AgentType.PERSON || this.agents[agentIdx].type == AgentType.ORGANIZATION)
+        if(this.agents[agentIdx].type === AgentType.PERSON || this.agents[agentIdx].type === AgentType.ORGANIZATION)
             this.activities[activityIdx].owner = this.agents[agentIdx];
-        else if(this.agents[agentIdx].type == AgentType.SOFTWARE_AGENT)
+        else if(this.agents[agentIdx].type === AgentType.SOFTWARE_AGENT)
             this.activities[activityIdx].software = this.agents[agentIdx];
         //this.agents[agentIdx].role = role ? role : '';
         return this.agents[agentIdx];
+    }
+
+    setAgentEntityRelation(agentId, entityId) {
+        let agentIdx = this.agents.findIndex(agent => agent.id === agentId);
+        let entityIdx = this.entities.findIndex(entity => entity.id === entityId);
+        if(agentIdx === -1 || entityIdx === -1) {
+            console.error('Could not find <id> in document!');
+            return null;
+        }
+        let corresActivity = null;
+        for(let activity of this.activities) {
+            if(activity.created.id === this.entities[entityIdx].id) {
+                corresActivity = activity;
+                break;
+            }
+        }
+        if(corresActivity && corresActivity.owner !== {})
+            corresActivity.owner = this.agents[agentIdx];
     }
 }
 

@@ -15,6 +15,7 @@ const parseEntities = Symbol('parseEntities');
 const parseUsage = Symbol('parseUsage');
 const parseGeneration = Symbol('parseGeneration');
 const parseAssociation = Symbol('parseAssociation');
+const parseAttribution = Symbol('parseAttribution');
 
 class JSONParser extends AParser{
 
@@ -30,6 +31,7 @@ class JSONParser extends AParser{
         this[parseUsage](rawDocMap.get(ProvComp.USAGE), parsedDoc);
         this[parseGeneration](rawDocMap.get(ProvComp.GENERATION), parsedDoc);
         this[parseAssociation](rawDocMap.get(ProvComp.ASSOCIATION), parsedDoc);
+        this[parseAttribution](rawDocMap.get(ProvComp.ATTRIBUTION), parsedDoc);
 
         return parsedDoc;
     }
@@ -92,6 +94,13 @@ class JSONParser extends AParser{
             doc.setAgentRelation(association[ProvAttr.AGENT], association[ProvAttr.ACTIVITY], association[ProvAttr.ROLE]);
         }
     }
+
+    static[parseAttribution](rawObj, doc) {
+        for(let attributionId in rawObj) {
+            let attribution = rawObj[attributionId];
+            doc.setAgentEntityRelation(attribution[ProvAttr.AGENT], attribution[ProvAttr.ENTITY]);
+        }
+    };
 
 }
 
