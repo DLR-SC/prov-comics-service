@@ -1,7 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 
-class ExportInitGenerator extends AGenerator {
+class ExportEndGenerator extends AGenerator {
     constructor(activity, size) {
         super(size);
         this.activity = activity;
@@ -9,14 +9,13 @@ class ExportInitGenerator extends AGenerator {
 
     generate() {
         Builder.buildSmartphone(this.paper, this.activity.software.label);
-        Builder.buildEntity(this.paper, 200, 170, 1.0);
+        Builder.buildDataEntity(this.paper);
+        Builder.buildCheck(this.paper, 230, 300);
 
-        this.paper.rect(193, 320, 130, 30, 5).attr({ fill: '#fff', stroke: '#aaa' });
-        this.paper.text(225, 169.5, 'Export ' + this.activity.created.type.toUpperCase()).attr({ fill: '#000', 'font-size': 12, 'font-weight': 'bold', 'text-anchor': 'start' });
-
+        this.paper.text(260, 130, '.' + this.activity.created.type).attr({ fill: '#454545', 'font-size': 13, 'font-weight': 'bold', 'text-anchor': 'middle' });
         this.paper.text('97%', 13, this.activity.id.split(':')[1].toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#ff5415', 'text-anchor': 'end' });
     }
 
 }
 
-module.exports = ExportInitGenerator;
+module.exports = ExportEndGenerator;

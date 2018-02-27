@@ -9,7 +9,7 @@ class ExportActionGenerator extends AGenerator {
 
     generate() {
         Builder.buildSmartphone(this.paper, this.activity.software.label);
-        Builder.buildEntity(this.paper);
+        Builder.buildEntity(this.paper, 200, 170, 1.0);
 
         this.paper.rect(193, 320, 130, 30, 5).attr({ fill: '#fff', stroke: '#aaa' });
         this.paper.text(225, 169.5, 'Export ' + this.activity.created.type.toUpperCase()).attr({ fill: '#000', 'font-size': 12, 'font-weight': 'bold', 'text-anchor': 'start' });
