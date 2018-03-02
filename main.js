@@ -2,7 +2,7 @@ const fs = require('fs');
 const httpServer = require('http');
 const fileFormat = require('./model/EFileFormats');
 const DocumentCtrl = require('./controller/DocumentCtrl');
-const Generator = require('./services/ImageGeneration/SequenceGenerator/AggregationGenerator');
+const Generator = require('./services/ImageGeneration/SequenceGenerator/VisualizationGenerator');
 
 let rawDocument = fs.readFileSync('./resources/export_example.json', { encoding: 'utf8' });
 let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
