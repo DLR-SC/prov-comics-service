@@ -8,7 +8,6 @@ const JSONUtils = require('./JSONUtils');
 
 //Static private methods
 const prepareDocument = Symbol('prepareDocument');
-const resolveQualifiedNames = Symbol('resolveQualifiedNames');
 const parseActivities = Symbol('parseActivities');
 const parseAgents = Symbol('parseAgents');
 const parseEntities = Symbol('parseEntities');
@@ -51,7 +50,7 @@ class JSONParser extends AParser{
     static [parseActivities](rawObj, doc) {
         for(let activityId in rawObj) {
             let activity = rawObj[activityId];
-            doc.addActivity(activityId, activity[ProvAttr.START_TIME], activity[ProvAttr.END_TIME]);
+            doc.addActivity(activityId, activity[ProvAttr.START_TIME], activity[ProvAttr.END_TIME], activity[ProvAttr.TYPE], activity[ProvAttr.LABEL]);
         }
     }
 
@@ -59,7 +58,7 @@ class JSONParser extends AParser{
         for(let agentId in rawObj) {
             let agent = rawObj[agentId];
             if(agent[ProvAttr.TYPE] === AgentType.PERSON || agent[ProvAttr.TYPE] === AgentType.SOFTWARE_AGENT || agent[ProvAttr.TYPE] === AgentType.ORGANIZATION) {
-                let type = agent[ProvAttr.TYPE] === AgentType.SOFTWARE_AGENT ? AgentType.SOFTWARE_AGENT : AgentType.PERSON;
+                let type = agent[ProvAttr.TYPE];
                 let deviceKey = JSONUtils.findKeyInObj('device', agent);
                 doc.addAgent(agentId, type, agent[ProvAttr.LABEL], agent[deviceKey]);
             } else throw new Error('Invalid agent type detected, only prov:SoftwareAgent or prov:Person are allowed');

@@ -1,7 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 
-class InputStartGenerator extends AGenerator {
+class InputInitGenerator extends AGenerator {
     constructor(activity, size) {
         super(size);
         this.activity = activity;
@@ -16,4 +16,4 @@ class InputStartGenerator extends AGenerator {
 
 }
 
-module.exports = InputStartGenerator;
+module.exports = InputInitGenerator;

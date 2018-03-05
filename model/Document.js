@@ -22,15 +22,18 @@ class Document {
         return string;
     }
 
-    addActivity(id, startTime, endTime, label) {
+    //ToDo: Replace empty objects with NULL
+    addActivity(id, startTime, endTime, type, label) {
         try {
             let newActivity = {
                 id: id,
+                type: type,
                 startTime: new Date(startTime),
                 endTime: new Date(endTime),
                 label: label ? label : '',
                 owner: {},
-                software: {}
+                software: {},
+                organization: {}
             };
             this.activities.push(newActivity);
         } catch (e) {
@@ -72,6 +75,9 @@ class Document {
         return this.entities[entityIdx];
     }
 
+    /**
+     * Activated through association <agent -> activity>
+     */
     setAgentRelation(agentId, activityId, role) {
         let agentIdx = this.agents.findIndex(agent => agent.id === agentId);
         let activityIdx = this.activities.findIndex(activity => activity.id === activityId);
@@ -79,30 +85,37 @@ class Document {
             console.error('Could not find <id> in document!');
             return null;
         }
-        if(this.agents[agentIdx].type === AgentType.PERSON || this.agents[agentIdx].type === AgentType.ORGANIZATION)
+        if(this.agents[agentIdx].type === AgentType.PERSON )
             this.activities[activityIdx].owner = this.agents[agentIdx];
+        else if(this.agents[agentIdx].type === AgentType.ORGANIZATION)
+            this.activities[activityIdx].organization = this.agents[agentIdx];
         else if(this.agents[agentIdx].type === AgentType.SOFTWARE_AGENT)
             this.activities[activityIdx].software = this.agents[agentIdx];
         //this.agents[agentIdx].role = role ? role : '';
         return this.agents[agentIdx];
     }
 
+    /**
+     * Activated through association <agent -> data>
+     */
     setAgentEntityRelation(agentId, entityId) {
         let agentIdx = this.agents.findIndex(agent => agent.id === agentId);
         let entityIdx = this.entities.findIndex(entity => entity.id === entityId);
-        if(agentIdx === -1 || entityIdx === -1) {
+        if (agentIdx === -1 || entityIdx === -1) {
             console.error('Could not find <id> in document!');
             return null;
         }
         let corresActivity = null;
-        for(let activity of this.activities) {
-            if(activity.created.id === this.entities[entityIdx].id) {
+        for (let activity of this.activities) {
+            if (activity.created.id === this.entities[entityIdx].id) {
                 corresActivity = activity;
                 break;
             }
         }
-        if(corresActivity && corresActivity.owner !== {})
+        if (corresActivity && this.agents[agentIdx].type === AgentType.PERSON)
             corresActivity.owner = this.agents[agentIdx];
+        else if(corresActivity && this.agents[agentIdx].type == AgentType.ORGANIZATION)
+            corresActivity.organization = this.agents[agentIdx];
     }
 }
 

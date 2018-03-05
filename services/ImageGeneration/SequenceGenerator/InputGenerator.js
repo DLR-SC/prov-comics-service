@@ -1,5 +1,5 @@
 const IntroGen = require('../FrameGenerator/IntroGenerator');
-const StartGen = require('../FrameGenerator/InputStartGenerator');
+const StartGen = require('../FrameGenerator/InputInitGenerator');
 const EndGen = require('../FrameGenerator/InputEndGenerator');
 
 class InputGenerator {
