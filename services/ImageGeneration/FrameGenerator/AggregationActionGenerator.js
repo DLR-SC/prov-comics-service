@@ -3,8 +3,7 @@ const Builder = require('../ElementBuilder');
 
 class AggregationActionGenerator extends AGenerator {
     constructor(activity, size) {
-        super(size);
-        this.activity = activity;
+        super(size, activity);
     }
 
     generate() {

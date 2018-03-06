@@ -28,6 +28,10 @@ class JSONUtils {
 
         }
     }
+
+    static orderDocumentByTime(document) {
+        return document;
+    }
 }
 
 module.exports = JSONUtils;

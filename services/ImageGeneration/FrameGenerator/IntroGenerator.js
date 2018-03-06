@@ -4,8 +4,7 @@ const moment = require('moment');
 
 class IntroGenerator extends AGenerator {
     constructor(activity, size) {
-        super(size);
-        this.activity = activity;
+        super(size, activity);
     }
 
     generate() {

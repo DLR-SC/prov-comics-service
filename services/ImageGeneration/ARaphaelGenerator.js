@@ -2,7 +2,8 @@ const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
 class ARaphaelGenerator {
-    constructor(size) {
+    constructor(size, activity) {
+        this.activity = activity;
         this.size = size;
         this.viewportSize = 500;
         this.dom = new JSDOM('<html></html>', { pretendToBeVisual: true });
@@ -42,8 +43,15 @@ class ARaphaelGenerator {
         svg = svg.replace('<head></head><body>', '');
         svg = svg.replace('</body>', '');
         //console.log(svg);
-
         return svg;
+    }
+
+    toJSON() {
+        let data = this.toString();
+        return {
+            name: this.activity.id,
+            data: data
+        };
     }
 }
 

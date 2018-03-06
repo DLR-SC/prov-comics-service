@@ -27,7 +27,7 @@ class Document {
         try {
             let newActivity = {
                 id: id,
-                type: type,
+                type: type ? type : null,
                 startTime: new Date(startTime),
                 endTime: new Date(endTime),
                 label: label ? label : '',

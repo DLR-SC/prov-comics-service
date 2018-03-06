@@ -8,9 +8,9 @@ const modes = {
 
 class RequestInitGenerator extends AGenerator {
     constructor(activity, size) {
-        super(size);
-        this.activity = activity;
-        if(activity.type.toLowerCase().includes('upload'))
+        super(size, activity);
+        let type = activity.type;
+        if(type && type.toLowerCase().includes('upload'))
             this.mode = modes.UPLOAD;
         else
             this.mode = modes.DOWNLOAD;

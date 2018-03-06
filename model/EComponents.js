@@ -1,3 +1,12 @@
+const QSActivityType = {
+    INPUT: 'input',
+    EXPORT: 'export',
+    AGGREGATION: 'aggregate',
+    VISUALIZATION: 'visualize',
+    REQUEST: 'request',
+    SENSING: 'sense'
+};
+
 const ProvComponent = {
     ACTIVITY: 'activity',
     ENTITY: 'entity',
@@ -40,7 +49,8 @@ const EComponents = {
     ProvComponent: ProvComponent,
     ProvAttributes: ProvAttributes,
     AgentType: AgentType,
-    EntityRole: EntityRole
+    EntityRole: EntityRole,
+    QSActivityType: QSActivityType
 };
 
 
