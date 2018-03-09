@@ -1,5 +1,6 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
+const Entity = require('../Entity');
 
 const modes = {
     'UPLOAD': 0,
@@ -20,16 +21,18 @@ class RequestActionGenerator extends AGenerator {
         Builder.buildSmartphone(this.paper, this.activity.software.label, -50);
         Builder.buildOrganization(this.paper, this.activity.organization.label);
 
+        let entities = null;
         if(this.mode === modes.DOWNLOAD) {
             Builder.buildDownstream(this.paper);
             Builder.buildCloud(this.paper, 'Downloading...');
-            Builder.buildEntity(this.paper, 420, 140, 0.5);
-            Builder.buildEntity(this.paper, 370, 255, 0.4);
+            entities = [ new Entity(140, 420, 0.5, this.activity.usage.type, this.paper, false, false), new Entity(255, 370, 0.4, this.activity.usage.type, this.paper, false, false)]
         } else if(this.mode === modes.UPLOAD) {
             Builder.buildUpstream(this.paper);
             Builder.buildCloud(this.paper, 'Uploading...');
-            Builder.buildEntity(this.paper, 370, 255, 0.4);
+            entities = [ new Entity(255, 370, 0.4, this.activity.usage.type, this.paper, false, false) ];
         }
+
+        entities.forEach((value) => value.draw());
 
         this.paper.text('97%', 13, this.activity.id.split(':')[1].toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#ff5415', 'text-anchor': 'end' });
     }

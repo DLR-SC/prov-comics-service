@@ -6,7 +6,7 @@ const Generator = require('./services/ImageGeneration/SequenceGenerator');
 const ComicGenerator = require('./services/ImageGeneration/ComicGenerator');
 const IOWriter = require('./services/SequenceDiskWriter');
 
-let rawDocument = fs.readFileSync('./resources/flow.json', { encoding: 'utf8' });
+let rawDocument = fs.readFileSync('./resources/117824.json', { encoding: 'utf8' });
 let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
 //console.log(doc.toString());
 
@@ -24,7 +24,7 @@ ComicGenerator.createComic(doc, 500).then(comic =>  {
 });
 
 
-httpServer.createServer((request, response) => {
+/*httpServer.createServer((request, response) => {
     let index = request.url.substr(1);
     if(index < 0 || index >= seq.length) {
         response.writeHead(500);
@@ -35,5 +35,5 @@ httpServer.createServer((request, response) => {
     response.end(seq.data[index], 'utf-8');
 
 }).listen(8125);
-console.log('Server running at http://127.0.0.1:8125/');
+console.log('Server running at http://127.0.0.1:8125/');*/
 

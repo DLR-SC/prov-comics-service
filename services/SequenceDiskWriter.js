@@ -29,7 +29,7 @@ let writeSequenceToDisk = async function(sequence, clean, order) {
 function cleanDir(dir) {
     return new Promise(function(resolve, reject) {
         fs.readdir(dir, (err, files) => {
-            if (err) throw err;
+            if (err) reject(err);
 
             for (const file of files) {
                 fs.unlink(path.join(dir, file), err => {

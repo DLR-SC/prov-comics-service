@@ -6,6 +6,7 @@ class ExportEndGenerator extends AGenerator {
         super(size, activity);
     }
 
+    //TODO: Replace Data Entity
     generate() {
         Builder.buildSmartphone(this.paper, this.activity.software.label);
         Builder.buildDataEntity(this.paper);

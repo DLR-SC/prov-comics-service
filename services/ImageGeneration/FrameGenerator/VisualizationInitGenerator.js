@@ -1,5 +1,6 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
+const Entity = require('../Entity');
 
 class VisualizationInitGenerator extends AGenerator {
     constructor(activity, size) {
@@ -8,7 +9,8 @@ class VisualizationInitGenerator extends AGenerator {
 
     generate() {
         Builder.buildSmartphone(this.paper, this.activity.software.label);
-        Builder.buildEntity(this.paper, 200, 170, 1.0);
+        let entity = new Entity(170, 200, 1.0, this.activity.usage.type, this.paper, false, false);
+        entity.draw();
 
         this.paper.rect(193, 320, 130, 30, 5).attr({ fill: '#fff', stroke: '#aaa' });
         this.paper.text(260, 169.5, 'Visualize Data').attr({ fill: '#000', 'font-size': 12, 'font-weight': 'bold', 'text-anchor': 'middle' });

@@ -1,5 +1,6 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
+const Entity = require('../Entity');
 
 const modes = {
     'UPLOAD': 0,
@@ -20,8 +21,8 @@ class RequestEndGenerator extends AGenerator {
         Builder.buildSmartphone(this.paper, this.activity.software.label, -50);
         Builder.buildOrganization(this.paper, this.activity.organization.label);
 
-        Builder.buildEntity(this.paper, 150, 185, 1.0);
-        Builder.buildEntity(this.paper, 420, 140, 0.5);
+        let entities = [ new Entity(185, 150, 1.0, this.activity.usage.type, this.paper, false, false), new Entity(140, 420, 0.5, this.activity.usage.type, this.paper, false, false)];
+        entities.forEach(ent => ent.draw());
         Builder.buildCheck(this.paper, 180, 310);
 
         this.paper.text('97%', 13, this.activity.id.split(':')[1].toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#ff5415', 'text-anchor': 'end' });

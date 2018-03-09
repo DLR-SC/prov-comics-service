@@ -40,6 +40,7 @@ class ARaphaelGenerator {
 
     toString() {
         let svg = this.window.document.documentElement.innerHTML;
+        svg = svg.replace('<i title="Raphaël Colour Picker" style="display: none;"></i>', '');
         svg = svg.replace('<head></head><body>', '');
         svg = svg.replace('</body>', '');
         //console.log(svg);
