@@ -17,7 +17,7 @@ let writeSequenceToDisk = async function(sequence, clean, order) {
 
     let idx = 1;
     sequence.data.forEach((frame) => {
-        let filename = `frame_${sequence.name.split(':')[1]}_${order}_${idx++}.svg`;
+        let filename = `${order}_${idx++}_frame_${sequence.name.split(':')[1]}.svg`;
         let path = OUTPUT_DIR + filename;
         fs.writeFile(path, frame, (err) => {
             if (err) throw err;

@@ -32,6 +32,8 @@ class JSONParser extends AParser{
         this[parseAssociation](rawDocMap.get(ProvComp.ASSOCIATION), parsedDoc);
         this[parseAttribution](rawDocMap.get(ProvComp.ATTRIBUTION), parsedDoc);
 
+        parsedDoc = this.sortDocumentByDate(parsedDoc);
+
         return parsedDoc;
     }
 
@@ -99,8 +101,14 @@ class JSONParser extends AParser{
             let attribution = rawObj[attributionId];
             doc.setAgentEntityRelation(attribution[ProvAttr.AGENT], attribution[ProvAttr.ENTITY]);
         }
-    };
+    }
 
+    static sortDocumentByDate(parsedDoc) {
+        parsedDoc.activities.sort( (act1, act2) => {
+            return (act1.startTime > act2.startTime) - (act1.startTime < act2.startTime);
+        });
+        return parsedDoc;
+    }
 }
 
 module.exports = JSONParser;
