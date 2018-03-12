@@ -1,0 +1,28 @@
+{
+  "name": "prov-comics-service",
+  "version": "0.0.1",
+  "description": "REST Service for Provenace Comic Generation",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DLR-SC/prov-comics-service.git"
+  },
+  "author": "AgenoDrei",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/DLR-SC/prov-comics-service/issues"
+  },
+  "homepage": "https://github.com/DLR-SC/prov-comics-service#readme",
+  "dependencies": {
+    "eslint": "^4.16.0",
+    "jsdom": "^11.6.2",
+    "moment": "^2.20.1",
+    "raphael": "^2.2.7"
+  },
+  "devDependencies": {
+    "http": "0.0.0"
+  }
+}

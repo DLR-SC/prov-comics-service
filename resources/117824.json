@@ -1,0 +1,130 @@
+{
+  "wasAssociatedWith": {
+    "_:id5": {
+      "prov:agent": "ex:agent",
+      "prov:activity": "method:input"
+    },
+    "_:id4": {
+      "prov:agent": "user:s.mueller1995@gmail.com",
+      "prov:activity": "method:input"
+    },
+    "_:id6": {
+      "prov:agent": "ex:agent",
+      "prov:activity": "method:export"
+    },
+    "_:id3": {
+      "prov:agent": "ex:agent",
+      "prov:activity": "method:aggregate"
+    }
+  },
+  "wasDerivedFrom": {
+    "_:id7": {
+      "prov:usedEntity": "user:HabitSummary",
+      "prov:generatedEntity": "user:HabitReport"
+    }
+  },
+  "used": {
+    "_:id1": {
+      "prov:entity": "user:HabitData",
+      "prov:time": "2018-01-22T13:02:24+00:00",
+      "prov:activity": "method:aggregate"
+    },
+    "_:id2": {
+      "prov:entity": "user:HabitSummary",
+      "prov:time": "2018-01-22T13:02:24+00:00",
+      "prov:activity": "method:export"
+    }
+  },
+  "wasAttributedTo": {
+    "_:id11": {
+      "prov:entity": "user:HabitReport",
+      "prov:agent": "user:s.mueller1995@gmail.com"
+    },
+    "_:id13": {
+      "prov:entity": "user:HabitSummary",
+      "prov:agent": "user:s.mueller1995@gmail.com"
+    },
+    "_:id12": {
+      "prov:entity": "user:HabitData",
+      "prov:agent": "user:s.mueller1995@gmail.com"
+    }
+  },
+  "agent": {
+    "ex:agent": {
+      "prov:type": {
+        "type": "prov:QUALIFIED_NAME",
+        "$": "prov:SoftwareAgent"
+      },
+      "prov:label": "Loop Habit Tracking"
+    },
+    "user:s.mueller1995@gmail.com": {
+      "prov:type": {
+        "type": "prov:QUALIFIED_NAME",
+        "$": "prov:Person"
+      },
+      "prov:label": "Loop Tracking User"
+    }
+  },
+  "entity": {
+    "user:HabitReport": {
+      "prov:type": {
+        "type": "prov:QUALIFIED_NAME",
+        "$": "prov:UserData"
+      },
+      "prov:label": "Exported Userdata"
+    },
+    "user:HabitSummary": {
+      "prov:type": {
+        "type": "prov:QUALIFIED_NAME",
+        "$": "prov:UserData"
+      },
+      "prov:label": "Aggregated Userdata"
+    },
+    "user:HabitData": {
+      "prov:type": {
+        "type": "prov:QUALIFIED_NAME",
+        "$": "prov:UserData"
+      },
+      "prov:label": "Habit Userdata"
+    }
+  },
+  "prefix": {
+    "user": "http://loophabits.org/",
+    "method": "http://www.java.com/",
+    "ex": "http://example.com/#"
+  },
+  "activity": {
+    "method:export": {
+      "prov:startTime": "2018-01-22T13:02:24+00:00",
+      "prov:endTime": "2018-01-22T13:02:24+00:00",
+      "prov:type": "user:export"
+    },
+    "method:input": {
+      "prov:startTime": "2018-01-21T13:02:24+00:00",
+      "prov:endTime": "2018-01-22T13:02:24+00:00",
+      "prov:type": "user:input"
+    },
+    "method:aggregate": {
+      "prov:startTime": "2018-01-22T13:00:00+00:00",
+      "prov:endTime": "2018-01-22T13:02:24+00:00",
+      "prov:type": "user:aggregate"
+    }
+  },
+  "wasGeneratedBy": {
+    "_:id9": {
+      "prov:entity": "user:HabitData",
+      "prov:time": "2018-01-22T13:02:24+00:00",
+      "prov:activity": "method:input"
+    },
+    "_:id8": {
+      "prov:entity": "user:HabitReport",
+      "prov:time": "2018-01-22T13:02:24+00:00",
+      "prov:activity": "method:export"
+    },
+    "_:id10": {
+      "prov:entity": "user:HabitSummary",
+      "prov:time": "2018-01-22T13:02:24+00:00",
+      "prov:activity": "method:aggregate"
+    }
+  }
+}
