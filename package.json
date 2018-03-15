@@ -4,7 +4,8 @@
   "description": "REST Service for Provenace Comic Generation",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "serve": "sls offline start"
   },
   "repository": {
     "type": "git",
@@ -17,12 +18,20 @@
   },
   "homepage": "https://github.com/DLR-SC/prov-comics-service#readme",
   "dependencies": {
+    "archiver": "^2.1.1",
+    "aws-sdk": "^2.209.0",
+    "body-parser": "^1.18.2",
     "eslint": "^4.16.0",
+    "express": "^4.16.3",
     "jsdom": "^11.6.2",
     "moment": "^2.20.1",
-    "raphael": "^2.2.7"
+    "node-native-zip": "^1.1.0",
+    "raphael": "^2.2.7",
+    "serverless-http": "^1.5.3"
   },
   "devDependencies": {
-    "http": "0.0.0"
+    "http": "0.0.0",
+    "serverless": "^1.26.1",
+    "serverless-offline": "^3.18.0"
   }
 }

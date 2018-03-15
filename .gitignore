@@ -35,6 +35,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+package-lock.json
+.serverless/
 
 # Typescript v1 declaration files
 typings/
@@ -58,12 +60,9 @@ typings/
 .env
 
 .project
-.serverless/
-node_modules/
 
 .vscode/
 .idea/
 *.iml
-package-lock.json
 
 output/*

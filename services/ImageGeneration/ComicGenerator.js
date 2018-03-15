@@ -1,10 +1,10 @@
 const ActivityType = require('../../model/EComponents').QSActivityType;
 const SeqGenerator = require('./SequenceGenerator');
 
-exports.createComic = async function(document, size) {
+exports.createComic = function(document, size) {
     let comic = [];
     for (let activity of document.activities) {
-        let activityType = await getActivityType(activity);
+        let activityType = getActivityType(activity);
 
         switch (activityType) {
         case ActivityType.INPUT:
@@ -32,12 +32,10 @@ exports.createComic = async function(document, size) {
 };
 
 function getActivityType(activity) {
-    return new Promise(function(resolve, reject) {
-        for(let key in ActivityType) {
-            let value = ActivityType[key];
-            if(activity.id.toLowerCase().indexOf(value) > -1)
-                resolve(ActivityType[key]);
-        }
-        resolve(null);
-    });
+    for(let key in ActivityType) {
+        let value = ActivityType[key];
+        if(activity.id.toLowerCase().indexOf(value) > -1)
+            return ActivityType[key];
+    }
+    return null;
 }
