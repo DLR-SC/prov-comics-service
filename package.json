@@ -18,14 +18,18 @@
   },
   "homepage": "https://github.com/DLR-SC/prov-comics-service#readme",
   "dependencies": {
+    "adm-zip": "^0.4.7",
     "archiver": "^2.1.1",
     "aws-sdk": "^2.209.0",
     "body-parser": "^1.18.2",
     "eslint": "^4.16.0",
     "express": "^4.16.3",
     "jsdom": "^11.6.2",
+    "mime": "^2.2.0",
     "moment": "^2.20.1",
     "node-native-zip": "^1.1.0",
+    "node-zip": "^1.1.1",
+    "path": "^0.12.7",
     "raphael": "^2.2.7",
     "serverless-http": "^1.5.3"
   },

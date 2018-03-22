@@ -6,6 +6,7 @@ const app = express();
 
 //Express setup
 app.use(bodyParser.json({ strict: false }));
+//app.use(express.compress());
 
 //Services
 const DocumentCtrl = require('./controller/DocumentCtrl');

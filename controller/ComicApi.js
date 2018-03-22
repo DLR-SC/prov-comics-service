@@ -1,42 +1,27 @@
 const Formats = require('../model/EFileFormats');
 const express = require('express');
 const fs = require('fs');
-const Archiver = require('archiver');
+const Zip = require('node-zip');
+const path = require('path');
 
 const responseType = 'application/zip';
 
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
+    const data = null;
 
     //Applies for every request in this router
     router.use(function dataLog (req, res, next) {
         console.log('API Comic invoked with data... ');
 
-        if (!req.is('application/json'))
-            return res.status(400).send('Wrong content type, only JSON is supported');
+        //if (!req.is('application/json'))
+        //    return res.status(400).send('Wrong content type, only JSON is supported');
 
         next();
     });
 
     router.post('/complete', function (req, res) {
-        res.set('Content-Type', 'application/zip');
-        //res.set('Content-Disposition', 'attachment; filename=comic.zip');
-        //res.responseType = 'arraybuffer';
-
-        let output = fs.createWriteStream(__dirname + '/../example.zip');
-        let archive = Archiver('zip', { zlib: { level: 9 } });
-
-        archive.on('error', function(err) {
-            return res.status(500).send({ error: err.message });
-        });
-
-        archive.on('finish', function() {
-            console.log('Archive wrote %d bytes', archive.pointer());
-            return res.end();
-        });
-
-        res.attachment('comic.zip');
-        archive.pipe(res);
+        const zip = new Zip;
 
         try {
             let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
@@ -49,14 +34,18 @@ module.exports = function (documentCtrl, comicGenerator) {
                     let frame = seq.data[frameKey];
                     let filename = `${parseInt(seqKey) + 1}_${parseInt(frameKey) + 1}_frame_${seq.name.split(':')[1]}.svg`;
 
-                    archive.append(frame, { name: filename });
+                    zip.file(filename, frame);
                 }
             }
+            const options = { base64: true, compression:'STORE' };
+            let zipBuffer = zip.generate(options);
+            //fs.writeFileSync('/tmp/files2.zip', zipBuffer, 'binary');
+            res.send(zipBuffer);
+            
         } catch (ex) {
             console.error(ex);
             return res.status(500).send('Invalid provenance document');
         }
-        archive.finalize();
     });
 
     return router;

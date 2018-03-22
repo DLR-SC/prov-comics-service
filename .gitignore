@@ -66,3 +66,5 @@ typings/
 *.iml
 
 output/*
+.tern-project
+.settings
