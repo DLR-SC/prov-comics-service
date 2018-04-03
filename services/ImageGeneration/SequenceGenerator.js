@@ -18,9 +18,21 @@ const VisualizationInitGen = require('./FrameGenerator/VisualizationInitGenerato
 const VisualizationActionGen = require('./FrameGenerator/VisualizationActionGenerator');
 const VisualizationEndGen = require('./FrameGenerator/VisualizationEndGenerator');
 
+const Concater = require('./SequenceConcater');
+
 
 class SequenceGenerator {
     constructor() { throw new Error('Static class, do not call the constructor'); }
+    
+    static generateInputStripe(activity, size){
+    	let generators = [ new IntroGen(activity, size), new InputInitGen(activity, size), new InputEndGen(activity, size) ];
+    	this.generateSequence(activity, size, generators);
+    	let con = new Concater(generators, size);
+    	con.generate();
+    	
+    	console.log('Seq: ', con.toString());
+    	return con.toString();
+    }
 
     static generateInputSequence(activity, size) {
         let generators = [ new IntroGen(activity, size), new InputInitGen(activity, size), new InputEndGen(activity, size) ];

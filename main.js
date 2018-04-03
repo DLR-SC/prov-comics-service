@@ -14,15 +14,17 @@ let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
 //let seq = Generator.generateRequestSequence(doc.activities[0], 500);
 //require('./services/SequenceDiskWriter').writeSequenceToDisk(seq);
 //console.log(builder.toString());
+Generator.generateInputStripe(doc.activities[0], 500);
 
 
-ComicGenerator.createComic(doc, 500).then(comic =>  {
+
+/*ComicGenerator.createComic(doc, 500).then(comic =>  {
     return IOWriter.writeComicToDisk(comic);
 }).then(() => {
     console.log('Comic has been written to disk');
 }).catch(error => {
     throw new Error(error);
-});
+});*/
 
 
 /*httpServer.createServer((request, response) => {

@@ -14,8 +14,8 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.use(function dataLog (req, res, next) {
         console.log('API Comic invoked with data... ');
 
-        //if (!req.is('application/json'))
-        //    return res.status(400).send('Wrong content type, only JSON is supported');
+        if (!req.is('application/json'))
+            return res.status(400).send('Wrong content type, only JSON is supported');
 
         next();
     });
@@ -26,7 +26,6 @@ module.exports = function (documentCtrl, comicGenerator) {
         try {
             let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
             let comic = comicGenerator.createComic(doc, 500);
-
 
             for (let seqKey in comic) {
                 let seq = comic[seqKey];
@@ -39,11 +38,10 @@ module.exports = function (documentCtrl, comicGenerator) {
             }
             const options = { base64: true, compression:'STORE' };
             let zipBuffer = zip.generate(options);
-            //fs.writeFileSync('/tmp/files2.zip', zipBuffer, 'binary');
             res.send(zipBuffer);
             
         } catch (ex) {
-            console.error(ex);
+            console.error('Generation error: ', ex);
             return res.status(500).send('Invalid provenance document');
         }
     });
