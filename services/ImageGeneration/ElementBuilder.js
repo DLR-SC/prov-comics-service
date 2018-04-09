@@ -33,15 +33,17 @@ exports.buildSmartphone = (paper, appName, x) => {
     let speaker = paper.path(STRING_PHONE_SPEAKER);
     let arm = paper.path(STRING_PHONE_ARM);
 
-    let xPos = x ? x + 50 : 50;
+    let xPos = x ? (x + 63) : 63;
 
-    body.attr({ fill: '#a1d9ec' }).transform(`S0.8,0.8,0,0T${xPos},70`);
-    display.attr({ fill: '#000' }).transform(`S0.8,0.8,0,0T${xPos},70`).toBack();
-    speaker.attr({ fill: '#454545' }).transform(`S0.8,0.8,0,0T${xPos},70`);
-    arm.attr({ fill: '#f8cd7a' }).transform(`S0.8,0.8,0,0T${xPos},70`);
+    body.attr({ fill: '#a1d9ec' }).transform(`t${xPos},88S0.8,0.8,0,0`);
+    display.attr({ fill: '#000' }).transform(`t${xPos},88S0.8,0.8,0,0`).toBack();
+    speaker.attr({ fill: '#454545' }).transform(`t${xPos},88S0.8,0.8,0,0`);
+    arm.attr({ fill: '#f8cd7a' }).transform(`t${xPos},88S0.8,0.8,0,0`);
 
-    xPos += 205;
-    paper.text(xPos, '24.5%', appName.toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#fff', 'text-anchor': 'middle' });
+    //console.log('Before build> ', body.matrix.split());
+
+    xPos += 194;
+    paper.text(xPos, '62', appName.toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#fff', 'text-anchor': 'middle' });
 };
 
 exports.buildInput = (paper) => {
@@ -51,11 +53,11 @@ exports.buildInput = (paper) => {
     let input2 = paper.path(STRING_INPUT_NEW);
     let keys = paper.path(STRING_KEYBOARD_KEYS);
 
-    keyBg.attr({ fill: '#555' }).transform('S0.6,0.45,0,0T168,295').toBack();
-    keys.attr({ fill: '#fff' }).transform('S0.6,0.45,0,0T168,295');
-    grid.attr({ fill: '#dbe82d' }).transform('S0.5,0.5,0,0T195,150');
-    input1.attr({ fill: '#888' }).transform('S0.5,0.5,0,0T195,150');
-    input2.attr({ fill: '#eee' }).transform('S0.5,0.5,0,0T195,150');
+    keyBg.attr({ fill: '#555' }).transform('t280,656S0.6,0.45,0,0').toBack();
+    keys.attr({ fill: '#fff' }).transform('t280,656S0.6,0.45,0,0');
+    grid.attr({ fill: '#dbe82d' }).transform('t390,300S0.5,0.5,0,0');
+    input1.attr({ fill: '#888' }).transform('t390,300S0.5,0.5,0,0');
+    input2.attr({ fill: '#eee' }).transform('t390,300S0.5,0.5,0,0');
 
     if(display) display.toBack();
 
@@ -69,7 +71,7 @@ exports.buildSmartphoneUser = (paper, nameTag) => {
     smartphone.transform('s0.8,0.8t79,34');
     person.attr({ fill: '#f8cd7a' });
     smartphone.attr({ fill: '#ADD8E6' });
-    paper.text('40%', '40%', nameTag[0].toUpperCase()).attr({ 'font-size': 40, 'font-weight': 'bold' });
+    paper.text('200', '100', nameTag[0].toUpperCase()).attr({ 'font-size': 40, 'font-weight': 'bold' });
 };
 
 exports.buildCheck = (paper, x, y) => {

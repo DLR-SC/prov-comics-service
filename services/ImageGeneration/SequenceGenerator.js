@@ -1,3 +1,6 @@
+const RaphaelSetup = require('./RaphaelSetup');
+RaphaelSetup.setupRaphael();
+
 const IntroGen = require('./FrameGenerator/IntroGenerator');
 const InputInitGen = require('./FrameGenerator/InputInitGenerator');
 const InputEndGen = require('./FrameGenerator/InputEndGenerator');
@@ -23,39 +26,39 @@ const Concater = require('./SequenceConcater');
 
 class SequenceGenerator {
     constructor() { throw new Error('Static class, do not call the constructor'); }
-    
-    static generateInputStripe(activity, size){
-    	let generators = [ new IntroGen(activity, size), new InputInitGen(activity, size), new InputEndGen(activity, size) ];
-    	this.generateSequence(activity, size, generators);
-    	let con = new Concater(generators, size);
-    	con.generate();
-    	
-    	console.log('Seq: ', con.toString());
-    	return con.toString();
-    }
 
-    static generateInputSequence(activity, size) {
+    static generateInputSequence(activity, size, stripe) {
         let generators = [ new IntroGen(activity, size), new InputInitGen(activity, size), new InputEndGen(activity, size) ];
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
         return this.generateSequence(activity, size, generators);
     }
 
-    static generateExportSequence(activity, size) {
+    static generateExportSequence(activity, size, stripe) {
         let generators = [ new IntroGen(activity, size), new ExportInitGen(activity, size), new ExportActionGen(activity, size), new ExportEndGen(activity, size)];
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
         return this.generateSequence(activity, size, generators);
     }
 
-    static generateAggregationSequence(activity, size) {
+    static generateAggregationSequence(activity, size, stripe) {
         let generators = [ new IntroGen(activity, size), new AggregationInitGen(activity, size), new AggregationActionGen(activity, size), new AggregationEndGen(activity, size)];
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
         return this.generateSequence(activity, size, generators);
     }
 
-    static generateRequestSequence(activity, size) {
+    static generateRequestSequence(activity, size, stripe) {
         let generators = [ new IntroGen(activity, size), new RequestInitGen(activity, size), new RequestActionGen(activity, size), new RequestEndGen(activity, size)];
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
         return this.generateSequence(activity, size, generators);
     }
 
-    static generateVisualizationSequence(activity, size) {
+    static generateVisualizationSequence(activity, size, stripe) {
         let generators = [ new IntroGen(activity, size), new VisualizationInitGen(activity, size), new VisualizationActionGen(activity, size), new VisualizationEndGen(activity, size)];
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
         return this.generateSequence(activity, size, generators);
     }
 
@@ -68,6 +71,19 @@ class SequenceGenerator {
         generatorList.forEach((value) => sequence.data.push(value.toString()));
 
         return sequence;
+    }
+
+    static generateStripe(activity, size, generatorList) {
+        let stripe = {
+            name: activity.id,
+            data: ''
+        };
+        generatorList.forEach((value) => value.generate());
+        let con = new Concater(generatorList, size);
+        con.generate();
+        stripe.data = con.toString();
+        return stripe;
+        
     }
 }
 

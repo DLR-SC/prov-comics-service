@@ -1,59 +1,65 @@
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
+const Setup = require('./RaphaelSetup');
+const shortid = require('shortid');
 
-const DocumentModel = new JSDOM('<html></html>', { pretendToBeVisual: false });
-global.window = DocumentModel.window;
-global.document = DocumentModel.window.document;
-global.navigator = DocumentModel.window.navigator;
-const Raphael = require('raphael');
-Raphael.setWindow(DocumentModel.window);
+function copyElm(orig, dest, elm, x) {
+    let type = elm.type;
+    let attrs = elm.attrs;
+    let transform = elm.matrix.split();
 
-(function (R) {
-    var cloneSet; // to cache set cloning function for optimisation
-    R.el.cloneToPaper = function (targetPaper) {
-        return (!this.removed &&
-            targetPaper[this.type]().attr(this.attr()));
-    };
+    //console.log('Info ' + type + '> ', elm.matrix.split());
 
-    R.st.cloneToPaper = function (targetPaper) {
-        targetPaper.setStart();
-        this.forEach(cloneSet || (cloneSet = function (el) {
-            el.cloneToPaper(targetPaper);
-        }));
-        return targetPaper.setFinish();
-    };
-}(Raphael));
+    let paper = dest;
+    let newElm = paper[type]();
+    newElm.attr(attrs);
+    //newElm.matrix.translate(transform.dx * (1 / transform.scalex), transform.dy * (1 / transform.scaley));
+    newElm.translate(transform.dx, transform.dy);
+    newElm.translate(x);
+    newElm.scale(transform.scalex, transform.scaley, 0, 0);
+    //newElm.transform(`T${x},0...`);
+    return newElm;
+}
 
 class SequenceConcater {
-	constructor(sequence, size) {
-		this.size = size;
+    constructor(sequence, size) {
+        this.size = size;
         this.sequence = sequence;
         this.viewportHeight = 500;
         this.viewportWidth = 500 * sequence.length;
 
-        this.paper = Raphael(0, 0, size * sequence.length, size);
-        //this.paper.rect(0, 0, this.viewportSize, this.viewportSize).attr({ fill: 'none', stroke: '#000', 'stroke-width': 3 });
-        this.paper.setViewBox(0, 0, this.viewportWidth, this.viewportHeight);   
+        this.id = shortid.generate();
+        
+        this.paper = Setup.createNewPaper(this.id, size, size * sequence.length);
+        this.paper.setViewBox(0, 0, this.viewportWidth, this.viewportHeight);
+
     }
 	
-	generate() {
-		let index = 0;
-		for(let frame of this.sequence) {
-			console.log(`Size: ${this.size}, X: ${this.size * index}`);
-			let st = frame.paper.set();
-			let x = this.size * index;
-			frame.paper.forEach(elm => {
-				//console.log(elm);
-				elm.cloneToPaper(this.paper);
-				elm.transform(`T${x},0`)
-			});
-			index++;
-		}
-		console.log('Processed frames: ', index);
-	}
+    generate() {
+        let index = 0;
+        for(let frame of this.sequence) {
+            console.log(`Size: ${this.size}, X: ${this.size * index}`);
+            let x = this.size * index;
+            let paper = this.paper;
+            let set = paper.set();
+          
+            frame.paper.forEach(elm => {
+                let newElm = copyElm(frame.paper, paper, elm, x);
+                //set.push(elm);
+                
+                //console.log('Before: ', elm.matrix.split());
+                //console.log('After: ', newElm.matrix.split());
+                
+                //newElm.transform('t'+ x + ',0...');
+            });
+            //set.transform('...T' + 0 + ',0');
+            index++;
+        }
+        console.log('Processed frames: ', index);
+    }
 	
-	toString() {
-        let svg = global.document.documentElement.innerHTML;
+    toString() {
+        let svg = global.document.getElementById(this.id).outerHTML;
         svg = svg.replace('<i title="Raphaël Colour Picker" style="display: none;"></i>', '');
         svg = svg.replace('<head></head><body>', '');
         svg = svg.replace('</body>', '');

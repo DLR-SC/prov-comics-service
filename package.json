@@ -22,6 +22,7 @@
     "archiver": "^2.1.1",
     "aws-sdk": "^2.209.0",
     "body-parser": "^1.18.2",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
     "eslint": "^4.16.0",
     "express": "^4.16.3",
     "jsdom": "^11.6.2",
@@ -31,7 +32,8 @@
     "node-zip": "^1.1.1",
     "path": "^0.12.7",
     "raphael": "^2.2.7",
-    "serverless-http": "^1.5.3"
+    "serverless-http": "^1.5.3",
+    "shortid": "^2.2.8"
   },
   "devDependencies": {
     "http": "0.0.0",
