@@ -46,5 +46,22 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
+    router.post('/stripe/:act', function (req, res) {
+        let activityId = req.params.act;
+        try {
+            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            if(activityId < 0 || activityId >= doc.activities.length) {
+                throw new Error('Invalid activity index');
+            }
+            let stripe = comicGenerator.createStripe(doc.activities[activityId], 500);
+            
+            res.type('.svg');
+            return res.status(200).send(stripe.data);
+        } catch (ex) {
+            console.error('Generation error: ', ex);
+            return res.status(500).send(ex.message);
+        }
+    });
+
     return router;
 };

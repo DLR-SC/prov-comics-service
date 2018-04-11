@@ -41,18 +41,10 @@ class SequenceConcater {
             console.log(`Size: ${this.size}, X: ${this.size * index}`);
             let x = this.size * index;
             let paper = this.paper;
-            let set = paper.set();
           
             frame.paper.forEach(elm => {
-                let newElm = copyElm(frame.paper, paper, elm, x);
-                //set.push(elm);
-                
-                //console.log('Before: ', elm.matrix.split());
-                //console.log('After: ', newElm.matrix.split());
-                
-                //newElm.transform('t'+ x + ',0...');
+                copyElm(frame.paper, paper, elm, x);
             });
-            //set.transform('...T' + 0 + ',0');
             index++;
         }
         console.log('Processed frames: ', index);
@@ -65,14 +57,6 @@ class SequenceConcater {
         svg = svg.replace('</body>', '');
         //console.log(svg);
         return svg;
-    }
-
-    toJSON() {
-        let data = this.toString();
-        return {
-            name: this.activity.id,
-            data: data
-        };
     }
 }
 
