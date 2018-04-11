@@ -3,7 +3,7 @@ const { JSDOM } = jsdom;
 const Setup = require('./RaphaelSetup');
 const shortid = require('shortid');
 
-function copyElm(orig, dest, elm, x) {
+function copyElm(orig, dest, elm, x, y) {
     let type = elm.type;
     let attrs = elm.attrs;
     let transform = elm.matrix.split();
@@ -15,39 +15,46 @@ function copyElm(orig, dest, elm, x) {
     newElm.attr(attrs);
     //newElm.matrix.translate(transform.dx * (1 / transform.scalex), transform.dy * (1 / transform.scaley));
     newElm.translate(transform.dx, transform.dy);
-    newElm.translate(x);
+    newElm.translate(x, y);
     newElm.scale(transform.scalex, transform.scaley, 0, 0);
     //newElm.transform(`T${x},0...`);
     return newElm;
 }
 
 class SequenceConcater {
-    constructor(sequence, size) {
+    constructor(generators, size) {
         this.size = size;
-        this.sequence = sequence;
-        this.viewportHeight = 500;
-        this.viewportWidth = 500 * sequence.length;
+        this.generators = generators;
+        this.width = Math.max(...generators.map(o => o.length));
+        this.height = generators.length;
 
         this.id = shortid.generate();
         
-        this.paper = Setup.createNewPaper(this.id, size, size * sequence.length);
-        this.paper.setViewBox(0, 0, this.viewportWidth, this.viewportHeight);
+        this.paper = Setup.createNewPaper(this.id, size * this.height, size * this.width);
+        this.paper.setViewBox(0, 0, 500 * this.width, 500 * this.height);
 
     }
 	
     generate() {
-        let index = 0;
-        for(let frame of this.sequence) {
-            console.log(`Size: ${this.size}, X: ${this.size * index}`);
-            let x = this.size * index;
-            let paper = this.paper;
-          
-            frame.paper.forEach(elm => {
-                copyElm(frame.paper, paper, elm, x);
-            });
-            index++;
+        let xIdx = 0;
+        let yIdx = 0;
+        for(let seqId in this.generators) {
+            let seq = this.generators[seqId];
+            let y = this.size * yIdx;
+            xIdx = 0;
+            for(let frame of seq) {
+                console.log(`Size: (${this.width * this.size}|${this.height * this.size}), Pos: (${this.size * xIdx}|${this.size * yIdx})`);
+                let x = this.size * xIdx;
+                let paper = this.paper;
+            
+                frame.paper.forEach(elm => {
+                    copyElm(frame.paper, paper, elm, x, y);
+                });
+                xIdx++;
+            }
+            yIdx++;
         }
-        console.log('Processed frames: ', index);
+        console.log('Processed frames: ', xIdx);
     }
 	
     toString() {

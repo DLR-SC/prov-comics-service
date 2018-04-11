@@ -1,14 +1,9 @@
 const Formats = require('../model/EFileFormats');
 const express = require('express');
-const fs = require('fs');
 const Zip = require('node-zip');
-const path = require('path');
-
-const responseType = 'application/zip';
 
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
-    const data = null;
 
     //Applies for every request in this router
     router.use(function dataLog (req, res, next) {
@@ -20,7 +15,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         next();
     });
 
-    router.post('/complete', function (req, res) {
+    router.post('/all', function (req, res) {
         const zip = new Zip;
 
         try {
@@ -46,6 +41,19 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
+    router.post('/complete', function (req, res) {
+        try {
+            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            let comic = comicGenerator.createAllStripes(doc, 500);
+            
+            res.type('.svg');
+            return res.status(200).send(comic.data);
+        } catch (ex) {
+            console.error('Generation error: ', ex);
+            return res.status(500).send(ex.message);
+        }
+    });
+
     router.post('/stripe/:act', function (req, res) {
         let activityId = req.params.act;
         try {
@@ -54,7 +62,7 @@ module.exports = function (documentCtrl, comicGenerator) {
                 throw new Error('Invalid activity index');
             }
             let stripe = comicGenerator.createStripe(doc.activities[activityId], 500);
-            
+
             res.type('.svg');
             return res.status(200).send(stripe.data);
         } catch (ex) {

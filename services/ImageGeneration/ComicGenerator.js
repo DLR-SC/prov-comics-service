@@ -52,6 +52,11 @@ exports.createStripe = function(activity, size) {
 };
 
 exports.createAllStripes = function(document, size) {
+    let types = [];
+    for(let activity of document.activities) {
+        types.push(getActivityType(activity));
+    }
+    return SeqGenerator.generateComic(document, types, size);
 };
 
 function getActivityType(activity) {

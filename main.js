@@ -14,7 +14,7 @@ let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
 //let seq = Generator.generateRequestSequence(doc.activities[0], 500);
 //require('./services/SequenceDiskWriter').writeSequenceToDisk(seq);
 //console.log(builder.toString());
-console.log(Generator.generateAggregationSequence(doc.activities[1], 500, true));
+console.log(ComicGenerator.createAllStripes(doc, 500));
 //let out = Generator.generateInputSequence(doc.activities[0], 500).data[0];
 //console.log(out);
 
