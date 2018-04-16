@@ -2,6 +2,8 @@ const Formats = require('../model/EFileFormats');
 const express = require('express');
 const Zip = require('node-zip');
 
+const SVG_SIZE = 500;
+
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
 
@@ -20,7 +22,7 @@ module.exports = function (documentCtrl, comicGenerator) {
 
         try {
             let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
-            let comic = comicGenerator.createComic(doc, 500);
+            let comic = comicGenerator.createComicFrames(doc, SVG_SIZE);
 
             for (let seqKey in comic) {
                 let seq = comic[seqKey];
@@ -44,7 +46,7 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.post('/complete', function (req, res) {
         try {
             let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
-            let comic = comicGenerator.createAllStripes(doc, 500);
+            let comic = comicGenerator.createComic(doc, SVG_SIZE);
             
             res.type('.svg');
             return res.status(200).send(comic.data);
@@ -61,10 +63,31 @@ module.exports = function (documentCtrl, comicGenerator) {
             if(activityId < 0 || activityId >= doc.activities.length) {
                 throw new Error('Invalid activity index');
             }
-            let stripe = comicGenerator.createStripe(doc.activities[activityId], 500);
+            let stripe = comicGenerator.createStripe(doc.activities[activityId], SVG_SIZE);
 
             res.type('.svg');
             return res.status(200).send(stripe.data);
+        } catch (ex) {
+            console.error('Generation error: ', ex);
+            return res.status(500).send(ex.message);
+        }
+    });
+
+    router.post('/stripes', function (req, res) {
+        const zip = new Zip;
+        try {
+            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            let stripes = comicGenerator.createAllStripes(doc, SVG_SIZE);
+
+            for (let stripeKey in stripes) {
+                let stripe = stripes[stripeKey];
+                let filename = `${parseInt(stripeKey) + 1}_frame_${stripe.name.split(':')[1]}.svg`;
+                zip.file(filename, stripe.data);
+                
+            }
+            const options = { base64: true, compression:'STORE' };
+            let zipBuffer = zip.generate(options);
+            return res.send(zipBuffer);
         } catch (ex) {
             console.error('Generation error: ', ex);
             return res.status(500).send(ex.message);

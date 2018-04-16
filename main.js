@@ -1,10 +1,10 @@
 const fs = require('fs');
-const httpServer = require('http');
+//const httpServer = require('http');
 const fileFormat = require('./model/EFileFormats');
 const DocumentCtrl = require('./controller/DocumentCtrl');
-const Generator = require('./services/ImageGeneration/SequenceGenerator');
+//const Generator = require('./services/ImageGeneration/SVGGenerator');
 const ComicGenerator = require('./services/ImageGeneration/ComicGenerator');
-const IOWriter = require('./services/SequenceDiskWriter');
+//const IOWriter = require('./services/SequenceDiskWriter');
 
 let rawDocument = fs.readFileSync('./resources/117824.json', { encoding: 'utf8' });
 //let rawDocument = fs.readFileSync('./resources/117824.json', { encoding: 'utf8' });
@@ -14,7 +14,7 @@ let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
 //let seq = Generator.generateRequestSequence(doc.activities[0], 500);
 //require('./services/SequenceDiskWriter').writeSequenceToDisk(seq);
 //console.log(builder.toString());
-console.log(ComicGenerator.createAllStripes(doc, 500));
+console.log(ComicGenerator.createComicFrames(doc, 500));
 //let out = Generator.generateInputSequence(doc.activities[0], 500).data[0];
 //console.log(out);
 

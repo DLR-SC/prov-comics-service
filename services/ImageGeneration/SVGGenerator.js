@@ -25,7 +25,7 @@ const VisualizationEndGen = require('./FrameGenerator/VisualizationEndGenerator'
 const Concater = require('./SequenceConcater');
 
 //TODO: Rename Class to SVG Generator
-class SequenceGenerator {
+class SVGGenerator {
     constructor() { throw new Error('Static class, do not call the constructor'); }
 
 
@@ -36,7 +36,7 @@ class SequenceGenerator {
             generators.push(this.getGenerators(type, document.activities[index], size));
             index++;
         }
-        return this.generateAllStripes(document, size, generators); //TODO: Do some actual sh**
+        return this.generateAllStripes(document, size, generators);
     }
 
     static generateInputSequence(activity, size, stripe) {
@@ -117,9 +117,8 @@ class SequenceGenerator {
         generators[ActivityType.AGGREGATION] = [ new IntroGen(activity, size), new AggregationInitGen(activity, size), new AggregationActionGen(activity, size), new AggregationEndGen(activity, size)];
         generators[ActivityType.REQUEST] = [ new IntroGen(activity, size), new RequestInitGen(activity, size), new RequestActionGen(activity, size), new RequestEndGen(activity, size)];
         generators[ActivityType.VISUALIZATION] = [ new IntroGen(activity, size), new VisualizationInitGen(activity, size), new VisualizationActionGen(activity, size), new VisualizationEndGen(activity, size)];
-
         return generators[type];
     }
 }
-
-module.exports = SequenceGenerator;
+    
+module.exports = SVGGenerator;

@@ -1,5 +1,3 @@
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 const Setup = require('./RaphaelSetup');
 const shortid = require('shortid');
 
@@ -43,12 +41,10 @@ class SequenceConcater {
             let y = this.size * yIdx;
             xIdx = 0;
             for(let frame of seq) {
-                console.log(`Size: (${this.width * this.size}|${this.height * this.size}), Pos: (${this.size * xIdx}|${this.size * yIdx})`);
+                //console.log(`Size: (${this.width * this.size}|${this.height * this.size}), Pos: (${this.size * xIdx}|${this.size * yIdx})`);
                 let x = this.size * xIdx;
-                let paper = this.paper;
-            
                 frame.paper.forEach(elm => {
-                    copyElm(frame.paper, paper, elm, x, y);
+                    copyElm(frame.paper, this.paper, elm, x, y);
                 });
                 xIdx++;
             }
