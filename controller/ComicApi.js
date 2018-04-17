@@ -1,8 +1,10 @@
 const Formats = require('../model/EFileFormats');
 const express = require('express');
 const Zip = require('node-zip');
+const axios = require('axios');
 
 const SVG_SIZE = 500;
+const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
 
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
@@ -92,6 +94,32 @@ module.exports = function (documentCtrl, comicGenerator) {
             console.error('Generation error: ', ex);
             return res.status(500).send(ex.message);
         }
+    });
+
+    router.get('/store/:id', function(req, res) {
+        let docId = req.params.id;
+        let reqUrl = PROV_STORE_BASE_URL + 'documents/' + docId + '.json';
+        axios.get(reqUrl).then(response => {
+            try {
+                let doc = documentCtrl.parseProvDocument(response.data, Formats.JSON);
+                let comic = comicGenerator.createComic(doc, SVG_SIZE);
+                res.type('.svg');
+                return res.status(200).send(comic.data);
+            } catch (ex) {
+                console.error('Generation error: ', ex);
+                return res.status(500).send(ex.message);
+            }
+        }).catch(error => {
+            if (error.response) { //Error from server
+                console.error(error.response.data);
+                console.error(error.response.headers);
+                return res.status(error.response.status).send(error.response.data);
+            } else if (error.request) { // Error contacting server
+                console.error(error.request);
+                return res.status(500).send('ProvStore not reachable');
+            }
+        });
+
     });
 
     return router;
