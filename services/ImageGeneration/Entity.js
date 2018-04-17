@@ -48,8 +48,8 @@ class Entity {
         let entityPart = this.paper.path(STRING_ENTITY_PART);
         let folderScale = this.scale * 0.6;
 
-        entity.attr({ fill: '#dce831' }).transform(`s${folderScale},${folderScale},0,0t${this.x / folderScale},${this.y / folderScale}`);
-        entityPart.attr({ fill: '#eee' }).transform(`s${folderScale},${folderScale},0,0t${this.x / folderScale},${this.y / folderScale}`);
+        entity.attr({ fill: '#dce831' }).transform(`t${this.x},${this.y}s${folderScale},${folderScale},0,0`);
+        entityPart.attr({ fill: '#eee' }).transform(`t${this.x},${this.y}s${folderScale},${folderScale},0,0`);
 
         if(!this.split)
             this.drawEntityType(this.x, this.y, this.type, this.scale);

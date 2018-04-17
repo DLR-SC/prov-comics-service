@@ -20,7 +20,7 @@ class JSONParser extends AParser{
 
     static parse(rawDocument) {
         let parsedDoc = new Document();
-        let rawDocObj = JSON.parse(rawDocument);
+        let rawDocObj = (typeof rawDocument === 'string') ? JSON.parse(rawDocument) : rawDocument;
 
         let rawDocMap = this[prepareDocument](rawDocObj); //convert list of objects to more usable map format
 

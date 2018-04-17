@@ -1,22 +1,14 @@
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
+const shortid = require('shortid');
+const setup = require('./RaphaelSetup');
 
 class ARaphaelGenerator {
     constructor(size, activity) {
         this.activity = activity;
         this.size = size;
         this.viewportSize = 500;
-        this.dom = new JSDOM('<html></html>', { pretendToBeVisual: true });
-        this.window = this.dom.window;
+        this.id = shortid.generate();
 
-        global.window = this.window;
-        global.document = this.window.document;
-
-        global.navigator = this.window.navigator;
-        this.raphael = require('raphael');
-        this.raphael.setWindow(this.window);
-
-        this.paper = this.raphael(0, 0, this.size, this.size);
+        this.paper = setup.createNewPaper(this.id, size, size);
         this.paper.rect(0, 0, this.viewportSize, this.viewportSize).attr({ fill: 'none', stroke: '#000', 'stroke-width': 3 });
         this.paper.setViewBox(0, 0, this.viewportSize, this.viewportSize);
     }
@@ -39,7 +31,7 @@ class ARaphaelGenerator {
     }
 
     toString() {
-        let svg = this.window.document.documentElement.innerHTML;
+        let svg = global.document.getElementById(this.id).outerHTML;
         svg = svg.replace('<i title="Raphaël Colour Picker" style="display: none;"></i>', '');
         svg = svg.replace('<head></head><body>', '');
         svg = svg.replace('</body>', '');

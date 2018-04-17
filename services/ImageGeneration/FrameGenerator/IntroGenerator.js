@@ -15,11 +15,11 @@ class IntroGenerator extends AGenerator {
         //Header line
         this.paper.path('M0,40H500Z').attr({ fill: 'none', stroke: '#000', 'stroke-width': 2 });
         this.paper.text(10, 13, 'On  ' + date + ' at ' + time).attr({ 'font-size': 12, 'text-anchor': 'start', 'font-weight': 'bold' });
-        this.paper.text('97%', 13, this.activity.id.split(':')[1].toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#ff5415', 'text-anchor': 'end' });
+        this.paper.text('460', 13, this.activity.id.split(':')[1].toUpperCase()).attr({ 'font-size': 13, 'font-weight': 'bold', fill: '#ff5415', 'text-anchor': 'end' });
 
         //Name Texts
         let label = this.activity.owner.label ? this.activity.owner.label : this.activity.software.label;
-        this.paper.text('50%', '95%', label).attr({ 'font-size': 13, 'font-weight': 'bold' });
+        this.paper.text('230', '240', label).attr({ 'font-size': 13, 'font-weight': 'bold', 'text-anchor': 'middle' });
 
         Builder.buildSmartphoneUser(this.paper, label);
     }

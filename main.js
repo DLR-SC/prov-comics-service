@@ -1,27 +1,32 @@
 const fs = require('fs');
-const httpServer = require('http');
+//const httpServer = require('http');
 const fileFormat = require('./model/EFileFormats');
 const DocumentCtrl = require('./controller/DocumentCtrl');
-const Generator = require('./services/ImageGeneration/SequenceGenerator');
+//const Generator = require('./services/ImageGeneration/SVGGenerator');
 const ComicGenerator = require('./services/ImageGeneration/ComicGenerator');
-const IOWriter = require('./services/SequenceDiskWriter');
+//const IOWriter = require('./services/SequenceDiskWriter');
 
-let rawDocument = fs.readFileSync('./resources/flow.json', { encoding: 'utf8' });
+let rawDocument = fs.readFileSync('./resources/117824.json', { encoding: 'utf8' });
+//let rawDocument = fs.readFileSync('./resources/117824.json', { encoding: 'utf8' });
 let doc = DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON);
 //console.log(doc.toString());
 
 //let seq = Generator.generateRequestSequence(doc.activities[0], 500);
 //require('./services/SequenceDiskWriter').writeSequenceToDisk(seq);
 //console.log(builder.toString());
+console.log(ComicGenerator.createComicFrames(doc, 500));
+//let out = Generator.generateInputSequence(doc.activities[0], 500).data[0];
+//console.log(out);
 
 
-ComicGenerator.createComic(doc, 500).then(comic =>  {
+
+/*ComicGenerator.createComic(doc, 500).then(comic =>  {
     return IOWriter.writeComicToDisk(comic);
 }).then(() => {
     console.log('Comic has been written to disk');
 }).catch(error => {
     throw new Error(error);
-});
+});*/
 
 
 /*httpServer.createServer((request, response) => {
