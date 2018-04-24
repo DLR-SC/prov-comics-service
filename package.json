@@ -40,5 +40,9 @@
     "http": "0.0.0",
     "serverless": "^1.26.1",
     "serverless-offline": "^3.18.0"
+  },
+  "apidoc": {
+    "title": "Documentation for REST API",
+    "groups" : ["COMIC"]
   }
 }

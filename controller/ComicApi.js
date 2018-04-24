@@ -1,8 +1,7 @@
 const Formats = require('../model/EFileFormats');
 const express = require('express');
-const Zip = require('node-zip');
 const axios = require('axios');
-
+const zipService = require('../services/ZipService');
 const SVG_SIZE = 500;
 const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
 
@@ -15,28 +14,29 @@ module.exports = function (documentCtrl, comicGenerator) {
 
         if (!req.is('application/json'))
             return res.status(400).send('Wrong content type, only JSON is supported');
+        if(req.method == 'POST' && !req.body.data)
+            return res.status(400).send('You need to send data for the api to work!');
 
         next();
     });
 
+    /**
+     * @api {post} /all Convert ProvDocument to Comic frames
+     * @apiDescription Render ProvDocument as single images that are returned in a ZIP folder
+     * @apiName GetAllComicFrames
+     * @apiGroup COMIC
+     * 
+     * @apiParam {JSON} data    ProvDocument as JSON String
+     * 
+     * @apiSuccess {Zip} Base64 encoded zip archive
+     * 
+     * @apiError ParsingError ProvDocument could not be parsed
+     */
     router.post('/all', function (req, res) {
-        const zip = new Zip;
-
         try {
-            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
             let comic = comicGenerator.createComicFrames(doc, SVG_SIZE);
-
-            for (let seqKey in comic) {
-                let seq = comic[seqKey];
-                for(let frameKey in seq.data) {
-                    let frame = seq.data[frameKey];
-                    let filename = `${parseInt(seqKey) + 1}_${parseInt(frameKey) + 1}_frame_${seq.name.split(':')[1]}.svg`;
-
-                    zip.file(filename, frame);
-                }
-            }
-            const options = { base64: true, compression:'STORE' };
-            let zipBuffer = zip.generate(options);
+            let zipBuffer = zipService.comicFramesToZip(comic);
             res.send(zipBuffer);
             
         } catch (ex) {
@@ -45,9 +45,21 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
+    /**
+     * @api {post} /complete Convert ProvDocument to Comic image
+     * @apiDescription Render ProvDocument as a single image and return it
+     * @apiName GetComic
+     * @apiGroup COMIC
+     * 
+     * @apiParam {JSON} data    ProvDocument as JSON String
+     * 
+     * @apiSuccess {SVG} SVG image of the comic
+     * 
+     * @apiError ParsingError ProvDocument could not be parsed
+     */
     router.post('/complete', function (req, res) {
         try {
-            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
             let comic = comicGenerator.createComic(doc, SVG_SIZE);
             
             res.type('.svg');
@@ -58,11 +70,24 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
-    router.post('/stripe/:act', function (req, res) {
-        let activityId = req.params.act;
+    /**
+     * @api {post} /stripe Convert ProvDocument Activity to Comic Stripe
+     * @apiDescription Convert ProvDocument and return a specific activity as rendered comic stripe
+     * @apiName GetComicStripe
+     * @apiGroup COMIC
+     * 
+     * @apiParam {JSON} data        ProvDocument as JSON String
+     * @apiParam {Number} activity  index number of the stripe you want to get, starts with 0
+     * 
+     * @apiSuccess {SVG} SVG image of the wanted comic stripe
+     * 
+     * @apiError ParsingError ProvDocument could not be parsed
+     */
+    router.post('/stripe', function (req, res) {
+        let activityId = req.body.activity;
         try {
-            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
-            if(activityId < 0 || activityId >= doc.activities.length) {
+            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
+            if(!activityId || activityId < 0 || activityId >= doc.activities.length) {
                 throw new Error('Invalid activity index');
             }
             let stripe = comicGenerator.createStripe(doc.activities[activityId], SVG_SIZE);
@@ -75,20 +100,23 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
+    /**
+     * @api {post} /stripes Convert ProvDocument to folder of Comic Stripe
+     * @apiDescription Render activities of a ProvDocument as list of comic stripes that are returned in a ZIP folder
+     * @apiName GetComicStripes
+     * @apiGroup COMIC
+     * 
+     * @apiParam {JSON} data    ProvDocument as JSON String
+     *  
+     * @apiSuccess {ZIP} ZIP folder of SVG images of the comic stripes
+     * 
+     * @apiError ParsingError ProvDocument could not be parsed
+     */
     router.post('/stripes', function (req, res) {
-        const zip = new Zip;
         try {
-            let doc = documentCtrl.parseProvDocument(req.body, Formats.JSON);
+            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
             let stripes = comicGenerator.createAllStripes(doc, SVG_SIZE);
-
-            for (let stripeKey in stripes) {
-                let stripe = stripes[stripeKey];
-                let filename = `${parseInt(stripeKey) + 1}_frame_${stripe.name.split(':')[1]}.svg`;
-                zip.file(filename, stripe.data);
-                
-            }
-            const options = { base64: true, compression:'STORE' };
-            let zipBuffer = zip.generate(options);
+            let zipBuffer = zipService.comicStripesToZip(stripes);
             return res.send(zipBuffer);
         } catch (ex) {
             console.error('Generation error: ', ex);
@@ -96,6 +124,18 @@ module.exports = function (documentCtrl, comicGenerator) {
         }
     });
 
+    /**
+     * @api {get} /store/:documentId Download and render provenance document from ProvStore
+     * @apiDescription Downloads specific Document from ProvStore and returns it rendered as single image (see /complete)
+     * @apiName GetComicFromProvStore
+     * @apiGroup COMIC
+     * 
+     * @apiParam {Number} documentId    id of the ProvStore document
+     * 
+     * @apiSuccess {SVG} SVG image of the converted and downloaded Provenance Graph
+     * 
+     * @apiError ParsingError ProvDocument could not be parsed
+     */
     router.get('/store/:id', function(req, res) {
         let docId = req.params.id;
         let reqUrl = PROV_STORE_BASE_URL + 'documents/' + docId + '.json';
