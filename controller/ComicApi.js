@@ -2,6 +2,10 @@ const Formats = require('../model/EFileFormats');
 const express = require('express');
 const axios = require('axios');
 const zipService = require('../services/ZipService');
+const convertService = require('../services/ConvertService');
+const s3Service = require('../services/S3Service');
+const fs = require('fs');
+
 const SVG_SIZE = 500;
 const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
 
@@ -16,6 +20,10 @@ module.exports = function (documentCtrl, comicGenerator) {
             return res.status(400).send('Wrong content type, only JSON is supported');
         if(req.method == 'POST' && !req.body.data)
             return res.status(400).send('You need to send data for the api to work!');
+        if(req.method == 'POST' && !req.body.format)
+            req.body.format = 'png';
+        if(req.method == 'POST' && !req.body.size)
+            req.body.size = SVG_SIZE;
 
         next();
     });
@@ -24,9 +32,10 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @api {post} /all Convert ProvDocument to Comic frames
      * @apiDescription Render ProvDocument as single images that are returned in a ZIP folder
      * @apiName GetAllComicFrames
-     * @apiGroup COMIC
+     * @apiGroup Comic
      * 
-     * @apiParam {JSON} data    ProvDocument as JSON String
+     * @apiParam {JSON} data        ProvDocument as JSON String
+     * @apiParam {Number} [size]    Size of the generated image
      * 
      * @apiSuccess {Zip} Base64 encoded zip archive
      * 
@@ -35,9 +44,18 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.post('/all', function (req, res) {
         try {
             let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let comic = comicGenerator.createComicFrames(doc, SVG_SIZE);
-            let zipBuffer = zipService.comicFramesToZip(comic);
-            res.send(zipBuffer);
+            let comic = comicGenerator.createComicFrames(doc, req.body.size);
+            let fileKey = Date.now() + '_comic_all.zip';
+
+            zipService.comicFramesToZip(comic).then(zipData => {
+                return s3Service.uploadFile(Buffer.from(zipData, 'base64'), fileKey);
+            }).then(data => {
+                console.log('S3 Response: ', data);
+                return res.send(s3Service.getUrl(fileKey));
+            }).catch(err => {
+                console.error('Upload error: ', err);
+                return res.status(500).send(err);
+            });
             
         } catch (ex) {
             console.error('Generation error: ', ex);
@@ -49,9 +67,10 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @api {post} /complete Convert ProvDocument to Comic image
      * @apiDescription Render ProvDocument as a single image and return it
      * @apiName GetComic
-     * @apiGroup COMIC
+     * @apiGroup Comic
      * 
-     * @apiParam {JSON} data    ProvDocument as JSON String
+     * @apiParam {JSON} data        ProvDocument as JSON String
+     * @apiParam {Number} [size]    Size of the generated image
      * 
      * @apiSuccess {SVG} SVG image of the comic
      * 
@@ -60,10 +79,20 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.post('/complete', function (req, res) {
         try {
             let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let comic = comicGenerator.createComic(doc, SVG_SIZE);
-            
-            res.type('.svg');
-            return res.status(200).send(comic.data);
+            let comic = comicGenerator.createComic(doc, req.body.size);
+            let fileKey = Date.now() + '_comic_complete.' + req.body.format;
+
+            convertService.convertSvgString(comic, req.body.format).then(data => {
+                return s3Service.uploadFile(data, fileKey);
+            }).then(data => {
+                console.log('S3 Response: ', data);
+                return res.send(s3Service.getUrl(fileKey));
+            }).catch( err => {
+                console.error('Conversion/Upload error: ', err);
+                return res.status(500).send(err);
+            });
+
+            //return res.status(200).send(comic.data);
         } catch (ex) {
             console.error('Generation error: ', ex);
             return res.status(500).send(ex.message);
@@ -74,10 +103,11 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @api {post} /stripe Convert ProvDocument Activity to Comic Stripe
      * @apiDescription Convert ProvDocument and return a specific activity as rendered comic stripe
      * @apiName GetComicStripe
-     * @apiGroup COMIC
+     * @apiGroup Comic
      * 
      * @apiParam {JSON} data        ProvDocument as JSON String
-     * @apiParam {Number} activity  index number of the stripe you want to get, starts with 0
+     * @apiParam {Number} activity  Index number of the stripe you want to get, starts with 0
+     * @apiParam {Number} [size]    Size of the generated image
      * 
      * @apiSuccess {SVG} SVG image of the wanted comic stripe
      * 
@@ -90,10 +120,18 @@ module.exports = function (documentCtrl, comicGenerator) {
             if(!activityId || activityId < 0 || activityId >= doc.activities.length) {
                 throw new Error('Invalid activity index');
             }
-            let stripe = comicGenerator.createStripe(doc.activities[activityId], SVG_SIZE);
+            let stripe = comicGenerator.createStripe(doc.activities[activityId], req.body.size);
+            let fileKey = Date.now() + '_stripe.' + req.body.format;
 
-            res.type('.svg');
-            return res.status(200).send(stripe.data);
+            convertService.convertSvgString(stripe, req.body.format).then(data => {
+                return s3Service.uploadFile(data, fileKey);
+            }).then(data => {
+                console.log('S3 Response: ', data);
+                return res.send(s3Service.getUrl(fileKey));
+            }).catch( err => {
+                console.error('Conversion/Upload error: ', err);
+                return res.status(500).send(err);
+            });
         } catch (ex) {
             console.error('Generation error: ', ex);
             return res.status(500).send(ex.message);
@@ -104,9 +142,10 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @api {post} /stripes Convert ProvDocument to folder of Comic Stripe
      * @apiDescription Render activities of a ProvDocument as list of comic stripes that are returned in a ZIP folder
      * @apiName GetComicStripes
-     * @apiGroup COMIC
+     * @apiGroup Comic
      * 
-     * @apiParam {JSON} data    ProvDocument as JSON String
+     * @apiParam {JSON} data        ProvDocument as JSON String
+     * @apiParam {Number} [size]    Size of the generated image
      *  
      * @apiSuccess {ZIP} ZIP folder of SVG images of the comic stripes
      * 
@@ -115,9 +154,18 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.post('/stripes', function (req, res) {
         try {
             let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let stripes = comicGenerator.createAllStripes(doc, SVG_SIZE);
-            let zipBuffer = zipService.comicStripesToZip(stripes);
-            return res.send(zipBuffer);
+            let stripes = comicGenerator.createAllStripes(doc, req.body.size);
+            let fileKey = Date.now() + '_comic_stripes.zip';
+
+            zipService.comicStripesToZip(stripes).then(zipData => {
+                return s3Service.uploadFile(Buffer.from(zipData, 'base64'), fileKey);
+            }).then(data => {
+                console.log('S3 Response: ', data);
+                return res.send(s3Service.getUrl(fileKey));
+            }).catch(err => {
+                console.error('Upload error: ', err);
+                return res.status(500).send(err);
+            });
         } catch (ex) {
             console.error('Generation error: ', ex);
             return res.status(500).send(ex.message);
@@ -128,9 +176,10 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @api {get} /store/:documentId Download and render provenance document from ProvStore
      * @apiDescription Downloads specific Document from ProvStore and returns it rendered as single image (see /complete)
      * @apiName GetComicFromProvStore
-     * @apiGroup COMIC
+     * @apiGroup Comic
      * 
      * @apiParam {Number} documentId    id of the ProvStore document
+     * @apiParam {Number} [size]        Size of the generated image
      * 
      * @apiSuccess {SVG} SVG image of the converted and downloaded Provenance Graph
      * 
@@ -142,9 +191,18 @@ module.exports = function (documentCtrl, comicGenerator) {
         axios.get(reqUrl).then(response => {
             try {
                 let doc = documentCtrl.parseProvDocument(response.data, Formats.JSON);
-                let comic = comicGenerator.createComic(doc, SVG_SIZE);
-                res.type('.svg');
-                return res.status(200).send(comic.data);
+                let comic = comicGenerator.createComic(doc, req.body.size);
+
+                let fileKey = Date.now() + '_comic_complete.' + req.body.format;
+                convertService.convertSvgString(comic, 'png').then(data => {
+                    return s3Service.uploadFile(data, fileKey);
+                }).then(data => {
+                    console.log('S3 Response: ', data);
+                    return res.send(s3Service.getUrl(fileKey));
+                }).catch( err => {
+                    console.error('Conversion/Upload error: ', err);
+                    return res.status(500).send(err);
+                });
             } catch (ex) {
                 console.error('Generation error: ', ex);
                 return res.status(500).send(ex.message);

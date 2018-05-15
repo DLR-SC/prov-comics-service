@@ -30,7 +30,6 @@ class SequenceConcater {
         
         this.paper = Setup.createNewPaper(this.id, size * this.height, size * this.width);
         this.paper.setViewBox(0, 0, 500 * this.width, 500 * this.height);
-
     }
 	
     generate() {

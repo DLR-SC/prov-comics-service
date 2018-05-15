@@ -101,11 +101,15 @@ class SVGGenerator {
     static generateAllStripes(document, size, generatorList) {
         let comic = {
             name: 'comic',
-            data: ''
+            data: '',
+            width: 0,
+            height: 0
         };
         generatorList.forEach(seq => seq.forEach(frame => frame.generate()));
         let con = new Concater(generatorList, size);
         con.generate();
+        comic.width = con.width;
+        comic.height = con.height;
         comic.data = con.toString();
         return comic;
     }

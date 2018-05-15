@@ -5,6 +5,7 @@ class ZipService {
     }
 
     static comicFramesToZip(comic) {
+        //console.log(comic);
         const zip = new Zip;
 
         for (let seqKey in comic) {
@@ -16,8 +17,8 @@ class ZipService {
                 zip.file(filename, frame);
             }
         }
-        const options = { base64: true, compression:'STORE' };
-        return zip.generate(options);
+        const options = { base64: true, compression: 'STORE' };
+        return Promise.resolve(zip.generate(options));
     }
 
     static comicStripesToZip(stripes) {
@@ -30,7 +31,7 @@ class ZipService {
             
         }
         const options = { base64: true, compression:'STORE' };
-        return zip.generate(options);
+        return Promise.resolve(zip.generate(options));
     }
 }
 
