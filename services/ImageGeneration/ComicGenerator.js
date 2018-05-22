@@ -12,36 +12,56 @@ const GenMap = {
 
 exports.createComicFrames = function(document, size) {
     let comic = [];
-    for (let activity of document.activities) {
-        let activityType = getActivityType(activity);
+    try {
+        for (let activity of document.activities) {
+            let activityType = getActivityType(activity);
 
-        let seq = SeqGenerator[GenMap[activityType]](activity, size);
-        comic.push(seq);
+            let seq = SeqGenerator[GenMap[activityType]](activity, size);
+            comic.push(seq);
+        }
+    } catch(ex) {
+        return Promise.reject(ex);
     }
-    return comic;
+    return Promise.resolve(comic);
 };
 
 exports.createStripe = function(activity, size) {
-    let activityType = getActivityType(activity);
-    return SeqGenerator[GenMap[activityType]](activity, size, true);
+    let stripe = null;
+    try {
+        let activityType = getActivityType(activity);
+        stripe = SeqGenerator[GenMap[activityType]](activity, size, true);
+    } catch(ex) {
+        return Promise.reject(ex);
+    }
+    return Promise.resolve(stripe);
 };
 
 exports.createAllStripes = function(document, size) {
     let stripes = [];
-    for(let activity of document.activities) {
-        let activityType = getActivityType(activity);
-        let stripe = SeqGenerator[GenMap[activityType]](activity, size, true);
-        stripes.push(stripe);
+    try {
+        for(let activity of document.activities) {
+            let activityType = getActivityType(activity);
+            let stripe = SeqGenerator[GenMap[activityType]](activity, size, true);
+            stripes.push(stripe);
+        }
+    } catch(ex) {
+        return Promise.reject(ex);
     }
-    return stripes;
+    return Promise.resolve(stripes);
 };
 
 exports.createComic = function(document, size) {
-    let types = [];
-    for(let activity of document.activities) {
-        types.push(getActivityType(activity));
+    let comic = null;
+    try {
+        let types = [];
+        for(let activity of document.activities) {
+            types.push(getActivityType(activity));
+        }
+        comic = SeqGenerator.generateComic(document, types, size);
+    } catch(ex) {
+        return Promise.reject(ex);
     }
-    return SeqGenerator.generateComic(document, types, size);
+    return Promise.resolve(comic);
 };
 
 function getActivityType(activity) {

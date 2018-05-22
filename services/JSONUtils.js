@@ -32,6 +32,16 @@ class JSONUtils {
     static orderDocumentByTime(document) {
         return document;
     }
+
+    static isEnumValue(enumObj, value) {
+        for (const key in enumObj) {
+            if (!enumObj.hasOwnProperty(key))
+                continue;
+            if(enumObj[key] == value)
+                return true;
+        }
+        return false;
+    }
 }
 
 module.exports = JSONUtils;

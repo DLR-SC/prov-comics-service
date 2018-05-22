@@ -14,6 +14,8 @@ const ComicGenerator = require('./services/ImageGeneration/ComicGenerator');
 
 // Controller
 const ComicCtrl = require('./controller/ComicApi')(DocumentCtrl, ComicGenerator);
+const DocCtrl = require('./controller/ConverterApi')(DocumentCtrl, ComicGenerator);
 app.use('/api/v1/comic', ComicCtrl);
+app.use('/api/v1/doc', DocCtrl);
 
 module.exports.handler = serverless(app);

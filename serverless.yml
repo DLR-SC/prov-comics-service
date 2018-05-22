@@ -1,5 +1,3 @@
-
-
 service: comic
 
 provider:
@@ -43,13 +41,6 @@ functions:
 
 plugins:
   - serverless-offline
-
-resources:
-  Resources:
-    userStorage:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: prov-comics-download-storage
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"

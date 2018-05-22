@@ -18,7 +18,7 @@ class ZipService {
             }
         }
         const options = { base64: true, compression: 'STORE' };
-        return Promise.resolve(zip.generate(options));
+        return Promise.resolve(Buffer.from(zip.generate(options), 'base64'));
     }
 
     static comicStripesToZip(stripes) {
@@ -31,7 +31,7 @@ class ZipService {
             
         }
         const options = { base64: true, compression:'STORE' };
-        return Promise.resolve(zip.generate(options));
+        return Promise.resolve(Buffer.from(zip.generate(options), 'base64'));
     }
 }
 

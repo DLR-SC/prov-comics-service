@@ -8,13 +8,27 @@ class S3Service {
         throw new Error('Static class, should not be initialized');
     }
 
-    static uploadFile(data, filename) {
+    static uploadFile(data, filename, optParams) {
         let params = {
             Bucket: BUCKET,
             Key: filename,
             Body: data,
         };
+        if(optParams) {
+            params = Object.assign({}, params, optParams);
+        }
         return s3.putObject(params).promise();
+    }
+
+    static getFile(name, optParams) {
+        let params = {
+            Bucket: BUCKET,
+            Key: name
+        };
+        if(optParams) {
+            params = Object.assign({}, params, optParams);
+        }
+        return s3.getObject(params).promise();
     }
 
     static getUrl(filename) {

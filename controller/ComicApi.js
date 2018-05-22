@@ -42,25 +42,20 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiError ParsingError ProvDocument could not be parsed
      */
     router.post('/all', function (req, res) {
-        try {
-            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let comic = comicGenerator.createComicFrames(doc, req.body.size);
-            let fileKey = Date.now() + '_comic_all.zip';
-
-            zipService.comicFramesToZip(comic).then(zipData => {
-                return s3Service.uploadFile(Buffer.from(zipData, 'base64'), fileKey);
-            }).then(data => {
-                console.log('S3 Response: ', data);
-                return res.send(s3Service.getUrl(fileKey));
-            }).catch(err => {
-                console.error('Upload error: ', err);
-                return res.status(500).send(err);
-            });
-            
-        } catch (ex) {
-            console.error('Generation error: ', ex);
-            return res.status(500).send('Invalid provenance document');
-        }
+        let fileKey = Date.now() + '_comic_all.zip';
+        documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
+            return comicGenerator.createComicFrames(doc, req.body.size);
+        }).then(frames => {
+            return zipService.comicFramesToZip(frames);
+        }).then(zipData => {
+            return s3Service.uploadFile(zipData, fileKey);
+        }).then(data => {
+            console.log('S3 Response: ', data);
+            return res.send(s3Service.getUrl(fileKey));
+        }).catch(err => {
+            console.error('Generation error: ', err);
+            return res.status(500).send(err);
+        });
     });
 
     /**
@@ -77,26 +72,20 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiError ParsingError ProvDocument could not be parsed
      */
     router.post('/complete', function (req, res) {
-        try {
-            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let comic = comicGenerator.createComic(doc, req.body.size);
-            let fileKey = Date.now() + '_comic_complete.' + req.body.format;
-
-            convertService.convertSvgString(comic, req.body.format).then(data => {
-                return s3Service.uploadFile(data, fileKey);
-            }).then(data => {
-                console.log('S3 Response: ', data);
-                return res.send(s3Service.getUrl(fileKey));
-            }).catch( err => {
-                console.error('Conversion/Upload error: ', err);
-                return res.status(500).send(err);
-            });
-
-            //return res.status(200).send(comic.data);
-        } catch (ex) {
-            console.error('Generation error: ', ex);
-            return res.status(500).send(ex.message);
-        }
+        let fileKey = Date.now() + '_comic_complete.' + req.body.format;
+        documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
+            return comicGenerator.createComic(doc, req.body.size);
+        }).then(comic => {
+            return convertService.convertSvgString(comic, req.body.format);
+        }).then(data => {
+            return s3Service.uploadFile(data, fileKey);
+        }).then(data => {
+            console.log('S3 Response: ', data);
+            return res.send(s3Service.getUrl(fileKey));
+        }).catch( err => {
+            console.error('Conversion/Upload error: ', err);
+            return res.status(500).send(err);
+        });
     });
 
     /**
@@ -115,27 +104,22 @@ module.exports = function (documentCtrl, comicGenerator) {
      */
     router.post('/stripe', function (req, res) {
         let activityId = req.body.activity;
-        try {
-            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            if(!activityId || activityId < 0 || activityId >= doc.activities.length) {
+        let fileKey = Date.now() + '_stripe.' + req.body.format;
+        documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
+            if(!activityId || activityId < 0 || activityId >= doc.activities.length)
                 throw new Error('Invalid activity index');
-            }
-            let stripe = comicGenerator.createStripe(doc.activities[activityId], req.body.size);
-            let fileKey = Date.now() + '_stripe.' + req.body.format;
-
-            convertService.convertSvgString(stripe, req.body.format).then(data => {
-                return s3Service.uploadFile(data, fileKey);
-            }).then(data => {
-                console.log('S3 Response: ', data);
-                return res.send(s3Service.getUrl(fileKey));
-            }).catch( err => {
-                console.error('Conversion/Upload error: ', err);
-                return res.status(500).send(err);
-            });
-        } catch (ex) {
-            console.error('Generation error: ', ex);
-            return res.status(500).send(ex.message);
-        }
+            return comicGenerator.createStripe(doc.activities[activityId], req.body.size);
+        }).then(stripe => {
+            return  convertService.convertSvgString(stripe, req.body.format);
+        }).then(data => {
+            return s3Service.uploadFile(data, fileKey);
+        }).then(data => {
+            console.log('S3 Response: ', data);
+            return res.send(s3Service.getUrl(fileKey));
+        }).catch( err => {
+            console.error('Conversion/Upload error: ', err);
+            return res.status(500).send(err);
+        });
     });
 
     /**
@@ -152,24 +136,20 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiError ParsingError ProvDocument could not be parsed
      */
     router.post('/stripes', function (req, res) {
-        try {
-            let doc = documentCtrl.parseProvDocument(req.body.data, Formats.JSON);
-            let stripes = comicGenerator.createAllStripes(doc, req.body.size);
-            let fileKey = Date.now() + '_comic_stripes.zip';
-
-            zipService.comicStripesToZip(stripes).then(zipData => {
-                return s3Service.uploadFile(Buffer.from(zipData, 'base64'), fileKey);
-            }).then(data => {
-                console.log('S3 Response: ', data);
-                return res.send(s3Service.getUrl(fileKey));
-            }).catch(err => {
-                console.error('Upload error: ', err);
-                return res.status(500).send(err);
-            });
-        } catch (ex) {
-            console.error('Generation error: ', ex);
-            return res.status(500).send(ex.message);
-        }
+        let fileKey = Date.now() + '_comic_stripes.zip';
+        documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
+            return comicGenerator.createAllStripes(doc, req.body.size);
+        }).then(stripes => {
+            return zipService.comicStripesToZip(stripes);
+        }).then(zipData => {
+            return s3Service.uploadFile(zipData, fileKey);
+        }).then(data => {
+            console.log('S3 Response: ', data);
+            return res.send(s3Service.getUrl(fileKey));
+        }).catch(err => {
+            console.error('Upload error: ', err);
+            return res.status(500).send(err);
+        });
     });
 
     /**
@@ -188,25 +168,18 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.get('/store/:id', function(req, res) {
         let docId = req.params.id;
         let reqUrl = PROV_STORE_BASE_URL + 'documents/' + docId + '.json';
+        let fileKey = Date.now() + '_comic_complete.' + req.body.format;
         axios.get(reqUrl).then(response => {
-            try {
-                let doc = documentCtrl.parseProvDocument(response.data, Formats.JSON);
-                let comic = comicGenerator.createComic(doc, req.body.size);
-
-                let fileKey = Date.now() + '_comic_complete.' + req.body.format;
-                convertService.convertSvgString(comic, 'png').then(data => {
-                    return s3Service.uploadFile(data, fileKey);
-                }).then(data => {
-                    console.log('S3 Response: ', data);
-                    return res.send(s3Service.getUrl(fileKey));
-                }).catch( err => {
-                    console.error('Conversion/Upload error: ', err);
-                    return res.status(500).send(err);
-                });
-            } catch (ex) {
-                console.error('Generation error: ', ex);
-                return res.status(500).send(ex.message);
-            }
+            return documentCtrl.parseProvDocument(response.data, Formats.JSON);
+        }).then(doc => {
+            return comicGenerator.createComic(doc, req.body.size);
+        }).then(comic => {
+            return convertService.convertSvgString(comic, 'png');
+        }).then(data => {
+            return s3Service.uploadFile(data, fileKey);
+        }).then(data => {
+            console.log('S3 Response: ', data);
+            return res.send(s3Service.getUrl(fileKey));
         }).catch(error => {
             if (error.response) { //Error from server
                 console.error(error.response.data);
@@ -215,9 +188,11 @@ module.exports = function (documentCtrl, comicGenerator) {
             } else if (error.request) { // Error contacting server
                 console.error(error.request);
                 return res.status(500).send('ProvStore not reachable');
+            } else {
+                console.error('Generation error: ', error);
+                return res.status(500).send(error);
             }
         });
-
     });
 
     return router;

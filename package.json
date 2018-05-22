@@ -5,8 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "serve": "sls offline start",
-    "dockerbuild": "docker run -v \"$PWD\":/var/task lambci/lambda:build-nodejs6.10"
+    "serve": "sls offline start"
   },
   "repository": {
     "type": "git",
@@ -38,14 +37,13 @@
   "devDependencies": {
     "http": "0.0.0",
     "serverless": "^1.26.1",
-    "serverless-apigw-binary": "^0.4.4",
-    "serverless-apigwy-binary": "^0.1.0",
-    "serverless-offline": "^3.18.0"
+    "serverless-offline": "^3.23.0"
   },
   "apidoc": {
     "title": "Documentation for REST API",
     "groups": [
-      "Comic"
+      "Comic",
+      "Doc"
     ]
   }
 }

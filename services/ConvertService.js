@@ -13,7 +13,7 @@ class ConvertService {
         } else if(format == fileFormats.SVG) {
             return Promise.resolve(comic.data);
         } else  {
-            return Promise.reject('Invalid output format: Use svg/png/jpg');
+            return Promise.reject('Can only convert to valid output format: Use svg/png/jpg');
         }
     }
 }
