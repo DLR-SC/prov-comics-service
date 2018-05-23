@@ -52,7 +52,24 @@ module.exports = function (documentCtrl, comicGenerator) {
         });
     });
 
+    /**
+     * @api {get} /add Get a ProvDocument in the specified format
+     * @apiDescription Get a ProvDocument in a specified format and size, has to be uploaded before
+     * @apiName ConvertDocument
+     * @apiGroup Doc
+     * 
+     * @apiParam {String} name          Name of the ProvDocument, is returned with the UploadDocument function
+     * @apiParam {String} mode          Defines which action will be performed on the document ('createComicFrames', 'createAllStripes', 'createStripe', 'createComic')
+     * @apiParam {String} format        Image Type and Size, has to be given in this format: <Type>.<Size>; <Type> can be png, svg or jpg; <Size> can be any integer numnber
+     * @apiParam {Number} [act]         If you used the mode 'createStripe' this specifies the activity id
+     * 
+     * @apiSuccess {Url} Access url for the created file
+     * 
+     * @apiError GenerationError ProvDocument could not be created, converted or send
+     */
     router.get('/image/:name/:mode/:format/:act?', function(req, res) {
+        console.log('Node version: ', process.versions);
+
         let parameter;
         let key;
         imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
@@ -67,9 +84,9 @@ module.exports = function (documentCtrl, comicGenerator) {
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
         }).then(comicResult => {
             if(parameter.mode == ConvOpt.ALL_FRAMES) {
-                return zipService.comicFramesToZip(comicResult,  parameter.imageType);
+                return zipService.comicFramesToZip(comicResult,  parameter);
             } else if(parameter.mode == ConvOpt.ALL_STRIPES) {
-                return zipService.comicStripesToZip(comicResult, parameter.imageType);
+                return zipService.comicStripesToZip(comicResult, parameter);
             } else if(parameter.imageType == OutFormats.SVG) {
                 return Promise.resolve(comicResult.data);
             } else {
@@ -82,7 +99,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         }).then(uploadRes => {
             return res.send({ msg: 'Here is your converted document.', name: key, url: s3Service.getUrl(key), serverResponse: uploadRes });
         }).catch(err => {
-            console.error('Validation error: ', err);
+            console.error('Generation error: ', err);
             return res.status(500).send(err);
         });
     });

@@ -1,10 +1,12 @@
 const Zip = require('node-zip');
+const Format = require('../controller/EResFileFormats');
+
 class ZipService {
     constructor() {
         throw new Error('Static class, should not be initialized');
     }
 
-    static comicFramesToZip(comic) {
+    static comicFramesToZip(comic, parameter) {
         //console.log(comic);
         const zip = new Zip;
 
@@ -17,11 +19,12 @@ class ZipService {
                 zip.file(filename, frame);
             }
         }
+        parameter.imageType = Format.ZIP;
         const options = { base64: true, compression: 'STORE' };
         return Promise.resolve(Buffer.from(zip.generate(options), 'base64'));
     }
 
-    static comicStripesToZip(stripes) {
+    static comicStripesToZip(stripes, parameter) {
         const zip = new Zip;
         
         for (let stripeKey in stripes) {
@@ -30,6 +33,7 @@ class ZipService {
             zip.file(filename, stripe.data);
             
         }
+        parameter.imageType = Format.ZIP;
         const options = { base64: true, compression:'STORE' };
         return Promise.resolve(Buffer.from(zip.generate(options), 'base64'));
     }

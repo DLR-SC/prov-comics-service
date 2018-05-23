@@ -285,5 +285,124 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "controller/ComicApi.js",
     "groupTitle": "Comic"
+  },
+  {
+    "type": "get",
+    "url": "/add",
+    "title": "Get a ProvDocument in the specified format",
+    "description": "<p>Get a ProvDocument in a specified format and size, has to be uploaded before</p>",
+    "name": "ConvertDocument",
+    "group": "Doc",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the ProvDocument, is returned with the UploadDocument function</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "mode",
+            "description": "<p>Defines which action will be performed on the document ('createComicFrames', 'createAllStripes', 'createStripe', 'createComic')</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "format",
+            "description": "<p>Image Type and Size, has to be given in this format: <Type>.<Size>; <Type> can be png, svg or jpg; <Size> can be any integer numnber</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "act",
+            "description": "<p>If you used the mode 'createStripe' this specifies the activity id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Url",
+            "optional": false,
+            "field": "Access",
+            "description": "<p>url for the created file</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "GenerationError",
+            "description": "<p>ProvDocument could not be created, converted or send</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "controller/ConverterApi.js",
+    "groupTitle": "Doc"
+  },
+  {
+    "type": "post",
+    "url": "/add",
+    "title": "Upload a ProvDocument",
+    "description": "<p>Upload ProvDocument to use it in later API calls</p>",
+    "name": "UploadDocument",
+    "group": "Doc",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "JSON",
+            "optional": false,
+            "field": "data",
+            "description": "<p>ProvDocument as JSON String</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Url",
+            "optional": false,
+            "field": "Access",
+            "description": "<p>url for the stored document</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UploadError",
+            "description": "<p>ProvDocument could not be uploaded</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "controller/ConverterApi.js",
+    "groupTitle": "Doc"
   }
 ] });
