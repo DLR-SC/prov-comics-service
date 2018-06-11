@@ -288,7 +288,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/add",
+    "url": "/image/:name/:mode/:format/:act?",
     "title": "Get a ProvDocument in the specified format",
     "description": "<p>Get a ProvDocument in a specified format and size, has to be uploaded before</p>",
     "name": "ConvertDocument",
@@ -334,8 +334,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "Url",
             "optional": false,
-            "field": "Access",
-            "description": "<p>url for the created file</p>"
+            "field": "url",
+            "description": "<p>URL for the created file</p>"
           }
         ]
       }
@@ -383,8 +383,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "Url",
             "optional": false,
-            "field": "Access",
-            "description": "<p>url for the stored document</p>"
+            "field": "url",
+            "description": "<p>URL for the created file</p>"
           }
         ]
       }

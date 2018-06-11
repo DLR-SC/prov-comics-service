@@ -24,7 +24,6 @@ const VisualizationEndGen = require('./FrameGenerator/VisualizationEndGenerator'
 
 const Concater = require('./SequenceConcater');
 
-//TODO: Rename Class to SVG Generator
 class SVGGenerator {
     constructor() { throw new Error('Static class, do not call the constructor'); }
 

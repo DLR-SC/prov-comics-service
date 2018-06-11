@@ -37,7 +37,7 @@ module.exports = function (documentCtrl, comicGenerator) {
      * 
      * @apiParam {JSON} data        ProvDocument as JSON String
      * 
-     * @apiSuccess {Url} Access url for the stored document
+     * @apiSuccess {Url} url URL for the created file
      * 
      * @apiError UploadError ProvDocument could not be uploaded
      */
@@ -53,7 +53,7 @@ module.exports = function (documentCtrl, comicGenerator) {
     });
 
     /**
-     * @api {get} /add Get a ProvDocument in the specified format
+     * @api {get} /image/:name/:mode/:format/:act? Get a ProvDocument in the specified format
      * @apiDescription Get a ProvDocument in a specified format and size, has to be uploaded before
      * @apiName ConvertDocument
      * @apiGroup Doc
@@ -63,7 +63,7 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiParam {String} format        Image Type and Size, has to be given in this format: <Type>.<Size>; <Type> can be png, svg or jpg; <Size> can be any integer numnber
      * @apiParam {Number} [act]         If you used the mode 'createStripe' this specifies the activity id
      * 
-     * @apiSuccess {Url} Access url for the created file
+     * @apiSuccess {Url} url URL for the created file
      * 
      * @apiError GenerationError ProvDocument could not be created, converted or send
      */

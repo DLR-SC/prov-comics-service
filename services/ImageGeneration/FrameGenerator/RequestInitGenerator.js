@@ -1,6 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 const Entity = require('../Entity');
+const Device = require('../Device');
 
 const modes = {
     'UPLOAD': 0,
@@ -18,7 +19,8 @@ class RequestInitGenerator extends AGenerator {
     }
 
     generate() {
-        Builder.buildSmartphone(this.paper, this.activity.software.label, -50);
+        //Builder.buildSmartphone(this.paper, this.activity.software.label, -50);
+        new Device(0, -50, 1.0, this.paper, this.activity.software.device, this.activity.software.label).draw();
         Builder.buildOrganization(this.paper, this.activity.organization.label);
 
         let entities = null;

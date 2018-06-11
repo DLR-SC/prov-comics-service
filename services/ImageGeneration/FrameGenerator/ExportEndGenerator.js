@@ -1,6 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 const Entity = require('../Entity');
+const Device = require('../Device');
 
 class ExportEndGenerator extends AGenerator {
     constructor(activity, size) {
@@ -9,7 +10,8 @@ class ExportEndGenerator extends AGenerator {
 
     //TODO: Replace Data Entity
     generate() {
-        Builder.buildSmartphone(this.paper, this.activity.software.label);
+        //Builder.buildSmartphone(this.paper, this.activity.software.label);
+        new Device(0, 0, 1.0, this.paper, this.activity.software.device, this.activity.software.label).draw();      
         new Entity(175, 225, 1.0, this.activity.created.type, this.paper, false, false, true).draw();
         //Builder.buildDataEntity(this.paper);
         Builder.buildCheck(this.paper, 230, 300);

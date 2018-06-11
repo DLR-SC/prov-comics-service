@@ -1,6 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 const moment = require('moment');
+const Device = require('../Device');
 
 class IntroGenerator extends AGenerator {
     constructor(activity, size) {
@@ -21,7 +22,8 @@ class IntroGenerator extends AGenerator {
         let label = this.activity.owner.label ? this.activity.owner.label : this.activity.software.label;
         this.paper.text('230', '240', label).attr({ 'font-size': 13, 'font-weight': 'bold', 'text-anchor': 'middle' });
 
-        Builder.buildSmartphoneUser(this.paper, label);
+        new Device(0, 0, 1.0, this.paper, this.activity.software.device, this.activity.software.label).intro(label);        
+        //Builder.buildSmartphoneUser(this.paper, label);
     }
 }
 

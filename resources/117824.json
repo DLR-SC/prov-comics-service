@@ -55,7 +55,8 @@
         "type": "prov:QUALIFIED_NAME",
         "$": "prov:SoftwareAgent"
       },
-      "prov:label": "Loop Habit Tracking"
+      "prov:label": "Loop Habit Tracking",
+      "qs:device": "computer"
     },
     "user:s.mueller1995@gmail.com": {
       "prov:type": {

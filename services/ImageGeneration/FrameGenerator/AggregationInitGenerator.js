@@ -1,6 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 const Entity = require('../Entity');
+const Device = require('../Device');
 
 class AggregationInitGenerator extends AGenerator {
     constructor(activity, size) {
@@ -9,7 +10,8 @@ class AggregationInitGenerator extends AGenerator {
 
     //TODO: Implement multiple usage objs for aggregation
     generate() {
-        Builder.buildSmartphone(this.paper, this.activity.software.label);
+        //Builder.buildSmartphone(this.paper, this.activity.software.label);
+        new Device(0, 0, 1.0, this.paper, this.activity.software.device, this.activity.software.label).draw();        
         let entities = [ new Entity(125, 215, 0.7, this.activity.usage.type, this.paper, false, false), new Entity(235, 215, 0.7, null, this.paper, false, false) ];
         entities.forEach(value => value.draw());
 

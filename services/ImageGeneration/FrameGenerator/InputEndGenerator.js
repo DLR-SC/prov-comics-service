@@ -1,6 +1,7 @@
 const AGenerator = require('../ARaphaelGenerator');
 const Builder = require('../ElementBuilder');
 const Entity = require('../Entity');
+const Device = require('../Device');
 
 class InputEndGenerator extends AGenerator {
     constructor(activity, size) {
@@ -8,7 +9,8 @@ class InputEndGenerator extends AGenerator {
     }
 
     generate() {
-        Builder.buildSmartphone(this.paper, this.activity.software.label);
+        //Builder.buildSmartphone(this.paper, this.activity.software.label);
+        new Device(0, 0, 1.0, this.paper, this.activity.software.device, this.activity.software.label).draw();
         new Entity(170, 200, 1.0, this.activity.created.type, this.paper, false, false).draw();
         Builder.buildCheck(this.paper, 220, 300);
 
