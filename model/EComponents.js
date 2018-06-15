@@ -4,7 +4,7 @@ const QSActivityType = {
     AGGREGATION: 'aggregate',
     VISUALIZATION: 'visualize',
     REQUEST: 'request',
-    SENSING: 'sense'
+    SENSING: 'sensing'
 };
 
 const ProvComponent = {

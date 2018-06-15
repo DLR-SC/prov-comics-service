@@ -1,6 +1,7 @@
 const deviceType = {
     SMARTPHONE: 'smartphone',
-    COMPUTER: 'computer'
+    COMPUTER: 'computer',
+    SENSOR: 'sensor'
 };
 
 module.exports = deviceType;

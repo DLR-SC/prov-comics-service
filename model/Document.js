@@ -96,7 +96,7 @@ class Document {
     }
 
     /**
-     * Activated through association <agent -> data>
+     * Activated through attribution <agent -> data>
      */
     setAgentEntityRelation(agentId, entityId) {
         let agentIdx = this.agents.findIndex(agent => agent.id === agentId);
@@ -105,17 +105,21 @@ class Document {
             console.error('Could not find <id> in document!');
             return null;
         }
-        let corresActivity = null;
+        let corresActivity = [];
         for (let activity of this.activities) {
-            if (activity.created.id === this.entities[entityIdx].id) {
-                corresActivity = activity;
-                break;
+            if (activity.created.id === this.entities[entityIdx].id || activity.usage.id === this.entities[entityIdx].id) {
+                corresActivity.push(activity);
             }
         }
-        if (corresActivity && this.agents[agentIdx].type === AgentType.PERSON)
-            corresActivity.owner = this.agents[agentIdx];
-        else if(corresActivity && this.agents[agentIdx].type == AgentType.ORGANIZATION)
-            corresActivity.organization = this.agents[agentIdx];
+        if (corresActivity.length > 0 && this.agents[agentIdx].type === AgentType.PERSON) {
+            for(let cor of corresActivity) {
+                cor.owner = this.agents[agentIdx];
+            }
+        } else if(corresActivity.length > 0 && this.agents[agentIdx].type == AgentType.ORGANIZATION) {
+            for(let cor of corresActivity) {
+                cor.organization = this.agents[agentIdx];
+            }
+        }
     }
 }
 

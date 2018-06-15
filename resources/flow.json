@@ -164,7 +164,8 @@
   "activity": {
     "method:requestDown": {
       "prov:startTime": "2016-12-01T17:06:19+00:00",
-      "prov:endTime": "2016-12-01T17:06:20+00:00"
+      "prov:endTime": "2016-12-01T17:06:20+00:00",
+      "prov:type": "download"
     },
     "method:requestUp": {
       "prov:startTime": "2016-12-01T16:06:23+00:00",

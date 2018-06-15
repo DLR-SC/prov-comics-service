@@ -7,7 +7,7 @@ const GenMap = {
     'aggregate': 'generateAggregationSequence',
     'visualize': 'generateVisualizationSequence',
     'request': 'generateRequestSequence',
-    'sense': new Error('Not implemented')
+    'sensing': 'generateSensingSequence'
 };
 
 exports.createComicFrames = function(document, size) {

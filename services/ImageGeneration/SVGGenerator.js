@@ -22,6 +22,10 @@ const VisualizationInitGen = require('./FrameGenerator/VisualizationInitGenerato
 const VisualizationActionGen = require('./FrameGenerator/VisualizationActionGenerator');
 const VisualizationEndGen = require('./FrameGenerator/VisualizationEndGenerator');
 
+const SensingInitGen = require('./FrameGenerator/SensingInitGenerator');
+const SensingActionGen = require('./FrameGenerator/SensingActionGenerator');
+const SensingEndGen = require('./FrameGenerator/SensingEndGenerator');
+
 const Concater = require('./SequenceConcater');
 
 class SVGGenerator {
@@ -120,6 +124,7 @@ class SVGGenerator {
         generators[ActivityType.AGGREGATION] = [ new IntroGen(activity, size), new AggregationInitGen(activity, size), new AggregationActionGen(activity, size), new AggregationEndGen(activity, size)];
         generators[ActivityType.REQUEST] = [ new IntroGen(activity, size), new RequestInitGen(activity, size), new RequestActionGen(activity, size), new RequestEndGen(activity, size)];
         generators[ActivityType.VISUALIZATION] = [ new IntroGen(activity, size), new VisualizationInitGen(activity, size), new VisualizationActionGen(activity, size), new VisualizationEndGen(activity, size)];
+        generators[ActivityType.SENSING] = [ new IntroGen(activity, size), new SensingInitGen(activity, size), new SensingActionGen(activity, size), new SensingEndGen(activity, size) ];
         return generators[type];
     }
 }

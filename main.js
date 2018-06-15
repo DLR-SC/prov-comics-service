@@ -12,6 +12,8 @@ let rawDocument = fs.readFileSync('./resources/flow.json', { encoding: 'utf8' })
 //console.log(doc.toString());
 
 DocumentCtrl.parseProvDocument(rawDocument, fileFormat.JSON).then(doc => {
+    //console.log(doc.activities[0]);
+    //console.log(doc.agents);
     return ComicGenerator.createComic(doc, 500);
 }).then(comic => {
     fs.writeFileSync('comic.svg', comic.data);
