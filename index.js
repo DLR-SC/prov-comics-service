@@ -1,4 +1,3 @@
-const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -18,4 +17,6 @@ const DocCtrl = require('./controller/ConverterApi')(DocumentCtrl, ComicGenerato
 app.use('/api/v1/comic', ComicCtrl);
 app.use('/api/v1/doc', DocCtrl);
 
-module.exports.handler = serverless(app);
+app.listen(3000, () => {
+  console.log("Comic Service started on port 3000!");
+});
