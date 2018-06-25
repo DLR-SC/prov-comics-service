@@ -10,7 +10,7 @@ const GenMap = {
     'sensing': 'generateSensingSequence'
 };
 
-exports.createComicFrames = function(document, size) {
+exports.createAllFrames = function(document, size) {
     let comic = [];
     try {
         for (let activity of document.activities) {

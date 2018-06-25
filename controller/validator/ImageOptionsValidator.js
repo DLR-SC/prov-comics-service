@@ -7,7 +7,7 @@ class ImageOptionsValidator {
     }
 
     static validate(name, mode, format, activity) {
-        console.log(name + ', ' + mode + ', ' + format);
+        console.log('Validation: ' + name + ', ' + mode + ', ' + format + ', ' + activity);
         if(!name || typeof(name) != 'string') {
             return Promise.reject('Invalid parameters, name');
         } else if(!mode || !utils.isEnumValue(ConvOpt, mode)) {
@@ -15,15 +15,10 @@ class ImageOptionsValidator {
         } else if(!format || !this.isValidFormat(format)) {
             return Promise.reject('Invalid parameters, format');
         }
-        let act = null;
-        try {
-            act = parseInt(activity);
-        } catch(e) { act = null; }
+        let act = parseInt(activity, 10);
+        if(isNaN(act)) act = 0; 
 
-        let parameter = { name: name, mode: mode, imageType: this.getType(format), frameSize: this.getSize(format) };
-        if(act)
-            parameter.activity = act;
-    
+        let parameter = { name: name, mode: mode, imageType: this.getType(format), frameSize: this.getSize(format), activity: act };
         return Promise.resolve(parameter);
     }
 

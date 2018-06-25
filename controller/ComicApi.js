@@ -4,7 +4,6 @@ const axios = require('axios');
 const zipService = require('../services/ZipService');
 const convertService = require('../services/ConvertService');
 const s3Service = require('../services/S3Service');
-const fs = require('fs');
 
 const SVG_SIZE = 500;
 const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
@@ -44,7 +43,7 @@ module.exports = function (documentCtrl, comicGenerator) {
     router.post('/all', function (req, res) {
         let fileKey = Date.now() + '_comic_all.zip';
         documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
-            return comicGenerator.createComicFrames(doc, req.body.size);
+            return comicGenerator.createAllFrames(doc, req.body.size);
         }).then(frames => {
             return zipService.comicFramesToZip(frames);
         }).then(zipData => {

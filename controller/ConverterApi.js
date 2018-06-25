@@ -74,13 +74,17 @@ module.exports = function (documentCtrl, comicGenerator) {
         let key;
         imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
             parameter = params;
+            console.log(parameter, parameter.activity);
             return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
-            console.log(file);
+            //console.log(file);
             return documentCtrl.parseProvDocument(file.Body.toString(), InFormats.JSON);
         }).then(doc => {
-            if(parameter.activity && parameter.mode == ConvOpt.SINGLE_STRIPE)
-                return comicGenerator[parameter.mode](doc, parameter.frameSize);
+            console.log(parameter.mode, ConvOpt.SINGLE_STRIPE);
+            if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
+                console.log(parameter.mode, doc);
+                return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
+            }
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
         }).then(comicResult => {
             if(parameter.mode == ConvOpt.ALL_FRAMES) {
