@@ -1,8 +1,8 @@
 version: 0.1
 env:
   parameter-store:
-    access: "AccessKey"
-    secret: "AccessKeySecret"
+    AWS_ACCESS_KEY_ID: "AccessKey"
+    AWS_SECRET_ACCESS_KEY: "AccessKeySecret"
 phases:
   install:
     commands:
@@ -10,7 +10,7 @@ phases:
       - npm install -g serverless
   build:
     commands:
-      - serverless deploy --stage cicd | tee deploy.out 
-  post_build:
-    commands:
-      - echo "Everything is done :-)"
+      - echo $AWS_ACCESS_KEY_ID
+      - serverless deploy --stage cicd | tee deploy.out
+    finally:
+      - echo "Everything is done :-)" 
