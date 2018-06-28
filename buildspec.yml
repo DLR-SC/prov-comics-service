@@ -10,7 +10,8 @@ phases:
       - npm install -g serverless
   build:
     commands:
-      - echo $AWS_ACCESS_KEY_ID
+      - echo "Using node version> "
+      - node --version
       - serverless deploy --stage cicd | tee deploy.out
     finally:
       - echo "Everything is done :-)" 
