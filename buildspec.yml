@@ -1,4 +1,8 @@
 version: 0.1
+env:
+  parameter-store:
+    access: "AccessKey"
+    secret: "AccessKeySecret"
 phases:
   install:
     commands:
