@@ -1,5 +1,7 @@
 version: 0.1
 env:
+  variables:
+    PATH: "$PATH:node-v6.11.5-linux-x64/bin"
   parameter-store:
     AWS_ACCESS_KEY_ID: "AccessKey"
     AWS_SECRET_ACCESS_KEY: "AccessKeySecret"
@@ -10,7 +12,8 @@ phases:
       - npm install -g serverless
   build:
     commands:
-      - echo "Using node version> "
+      - echo "Build info> "
+      - uname -a
       - node --version
       - serverless deploy --stage cicd | tee deploy.out
     finally:
