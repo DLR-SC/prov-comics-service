@@ -3,7 +3,6 @@ const OutFormats = require('./EResFileFormats');
 const ConvOpt = require('./EConversionOptions');
 const express = require('express');
 const zipService = require('../services/ZipService');
-const convertService = require('../services/ConvertService');
 const s3Service = require('../services/S3Service');
 const imageVal = require('./validator/ImageOptionsValidator');
 
@@ -68,21 +67,16 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiError GenerationError ProvDocument could not be created, converted or send
      */
     router.get('/image/:name/:mode/:format/:act?', function(req, res) {
-        console.log('Node version: ', process.versions);
-
         let parameter;
         let key;
         imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
             parameter = params;
-            console.log(parameter, parameter.activity);
             return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
             //console.log(file);
             return documentCtrl.parseProvDocument(file.Body.toString(), InFormats.JSON);
         }).then(doc => {
-            console.log(parameter.mode, ConvOpt.SINGLE_STRIPE);
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
-                console.log(parameter.mode, doc);
                 return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
             }
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
@@ -91,14 +85,11 @@ module.exports = function (documentCtrl, comicGenerator) {
                 return zipService.comicFramesToZip(comicResult,  parameter);
             } else if(parameter.mode == ConvOpt.ALL_STRIPES) {
                 return zipService.comicStripesToZip(comicResult, parameter);
-            } else if(parameter.imageType == OutFormats.SVG) {
+            } else  {
                 return Promise.resolve(comicResult.data);
-            } else {
-                return convertService.convertSvgString(comicResult, parameter.imageType);
             }
         }).then(result => {
             key = parameter.name + '.' + parameter.imageType;
-            //console.log('Res: ', result)
             return s3Service.uploadFile(result, key);
         }).then(uploadRes => {
             return res.send({ msg: 'Here is your converted document.', name: key, url: s3Service.getUrl(key), serverResponse: uploadRes });

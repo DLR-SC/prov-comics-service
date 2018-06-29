@@ -2,7 +2,6 @@ const Formats = require('../model/EFileFormats');
 const express = require('express');
 const axios = require('axios');
 const zipService = require('../services/ZipService');
-const convertService = require('../services/ConvertService');
 const s3Service = require('../services/S3Service');
 
 const SVG_SIZE = 500;
@@ -14,13 +13,12 @@ module.exports = function (documentCtrl, comicGenerator) {
     //Applies for every request in this router
     router.use(function dataLog (req, res, next) {
         console.log('API Comic invoked with data... ');
+        req.body.format = 'svg';
 
         if (!req.is('application/json'))
             return res.status(400).send('Wrong content type, only JSON is supported');
         if(req.method == 'POST' && !req.body.data)
             return res.status(400).send('You need to send data for the api to work!');
-        if(req.method == 'POST' && !req.body.format)
-            req.body.format = 'png';
         if(req.method == 'POST' && !req.body.size)
             req.body.size = SVG_SIZE;
 
@@ -75,9 +73,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         documentCtrl.parseProvDocument(req.body.data, Formats.JSON).then(doc => {
             return comicGenerator.createComic(doc, req.body.size);
         }).then(comic => {
-            return convertService.convertSvgString(comic, req.body.format);
-        }).then(data => {
-            return s3Service.uploadFile(data, fileKey);
+            return s3Service.uploadFile(comic.data, fileKey);
         }).then(data => {
             console.log('S3 Response: ', data);
             return res.send(s3Service.getUrl(fileKey));
@@ -109,9 +105,7 @@ module.exports = function (documentCtrl, comicGenerator) {
                 throw new Error('Invalid activity index');
             return comicGenerator.createStripe(doc.activities[activityId], req.body.size);
         }).then(stripe => {
-            return  convertService.convertSvgString(stripe, req.body.format);
-        }).then(data => {
-            return s3Service.uploadFile(data, fileKey);
+            return s3Service.uploadFile(stripe.data, fileKey);
         }).then(data => {
             console.log('S3 Response: ', data);
             return res.send(s3Service.getUrl(fileKey));
@@ -173,9 +167,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         }).then(doc => {
             return comicGenerator.createComic(doc, req.body.size);
         }).then(comic => {
-            return convertService.convertSvgString(comic, 'png');
-        }).then(data => {
-            return s3Service.uploadFile(data, fileKey);
+            return s3Service.uploadFile(comic.data, fileKey);
         }).then(data => {
             console.log('S3 Response: ', data);
             return res.send(s3Service.getUrl(fileKey));
