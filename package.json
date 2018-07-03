@@ -19,7 +19,7 @@
   "homepage": "https://github.com/DLR-SC/prov-comics-service#readme",
   "dependencies": {
     "aws-sdk": "^2.239.1",
-    "axios": "^0.18.0",
+    "axios": "latest",
     "body-parser": "^1.18.2",
     "canvas-prebuilt": "^1.6.5-prerelease.1",
     "eslint": "^4.16.0",

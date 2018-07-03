@@ -5,9 +5,8 @@ const express = require('express');
 const zipService = require('../services/ZipService');
 const s3Service = require('../services/S3Service');
 const imageVal = require('./validator/ImageOptionsValidator');
-
-const SVG_SIZE = 500;
-const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
+const config = require('../config/config');
+const axios = require('axios');
 
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
@@ -23,7 +22,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         if(req.method == 'POST' && !req.body.format)
             req.body.format = 'png';
         if(req.method == 'POST' && !req.body.size)
-            req.body.size = SVG_SIZE;
+            req.body.size = config.COMIC_DEFAULT_SIZE;
 
         next();
     });
@@ -71,10 +70,13 @@ module.exports = function (documentCtrl, comicGenerator) {
         let key;
         imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
             parameter = params;
-            return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
+            if(parameter.store)
+                return axios.get(config.STORE_URL + 'documents/' + parameter.name + '.json');
+            else
+                return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
-            //console.log(file);
-            return documentCtrl.parseProvDocument(file.Body.toString(), InFormats.JSON);
+            let load = file.Body ? file.Body.toString : file.data;
+            return documentCtrl.parseProvDocument(load, InFormats.JSON);
         }).then(doc => {
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
                 return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
@@ -93,9 +95,18 @@ module.exports = function (documentCtrl, comicGenerator) {
             return s3Service.uploadFile(result, key);
         }).then(uploadRes => {
             return res.send({ msg: 'Here is your converted document.', name: key, url: s3Service.getUrl(key), serverResponse: uploadRes });
-        }).catch(err => {
-            console.error('Generation error: ', err);
-            return res.status(500).send(err);
+        }).catch(error => {
+            if (error.response) { //Error from server
+                console.error(error.response.data);
+                console.error(error.response.headers);
+                return res.status(error.response.status).send(error.response.data);
+            } else if (error.request) { // Error contacting server
+                console.error(error.request);
+                return res.status(500).send('ProvStore not reachable');
+            } else {
+                console.error('Generation error: ', error);
+                return res.status(500).send(error);
+            }
         });
     });
 

@@ -2,6 +2,8 @@ const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const tls = require('tls');
+tls.DEFAULT_ECDH_CURVE = 'auto';
 //const AWS = require('aws-sdk');
 
 //Express setup

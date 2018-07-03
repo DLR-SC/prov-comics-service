@@ -7,7 +7,6 @@ class ImageOptionsValidator {
     }
 
     static validate(name, mode, format, activity) {
-        console.log('Validation: ' + name + ', ' + mode + ', ' + format + ', ' + activity);
         if(!name || typeof(name) != 'string') {
             return Promise.reject('Invalid parameters, name');
         } else if(!mode || !utils.isEnumValue(ConvOpt, mode)) {
@@ -18,7 +17,8 @@ class ImageOptionsValidator {
         let act = parseInt(activity, 10);
         if(isNaN(act)) act = 0; 
 
-        let parameter = { name: name, mode: mode, imageType: this.getType(format), frameSize: this.getSize(format), activity: act };
+        let parameter = { name: this.getName(name), mode: mode, imageType: this.getType(format), frameSize: this.getSize(format), activity: act, store: this.isStore(name) };
+        console.log('Validated parameters: ', JSON.stringify(parameter));
         return Promise.resolve(parameter);
     }
 
@@ -42,14 +42,23 @@ class ImageOptionsValidator {
     static getSize(format) {
         let parts = format.split(/\./);
         let size = 500;
-        if(parts.length < 2)
-            return size;
-        try {
-            size = parseInt(parts[1]);
-        } catch(e) {
-            return size;
-        }
-        return size;
+        if(!isNaN(parseInt(parts[0])) && parts.length < 2)
+            return parseInt(parts[0]);
+        else if(!isNaN(parseInt(parts[1])))
+            return parseInt(parts[1]);
+        else return size;
+    }
+
+    static getName(name) {
+        if(name.indexOf('provstore') > -1)
+            return name.split(/_/)[1];
+        return name;
+    }
+
+    static isStore(name) {
+        if(name.indexOf('provstore') > -1)
+            return true;
+        return false;
     }
 }
 

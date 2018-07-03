@@ -3,10 +3,10 @@ const express = require('express');
 const axios = require('axios');
 const zipService = require('../services/ZipService');
 const s3Service = require('../services/S3Service');
+const config = require('../config/config');
 
-const SVG_SIZE = 500;
-const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
-
+const SVG_SIZE = config.COMIC_DEFAULT_SIZE;
+const PROV_STORE_BASE_URL = config.STORE_URL;
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
 
