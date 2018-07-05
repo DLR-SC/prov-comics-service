@@ -1,5 +1,4 @@
 const InFormats = require('../model/EFileFormats');
-const OutFormats = require('./EResFileFormats');
 const ConvOpt = require('./EConversionOptions');
 const express = require('express');
 const zipService = require('../services/ZipService');

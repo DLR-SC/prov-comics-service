@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
+const config = require('../config/config');
 
-const s3 = new AWS.S3({ region: 'eu-central-1' });
-const BUCKET = 'prov-comics-access-storage';
+const s3 = new AWS.S3({ region: config.REGION });
 
 class S3Service {
     constructor() {
@@ -10,7 +10,7 @@ class S3Service {
 
     static uploadFile(data, filename, optParams) {
         let params = {
-            Bucket: BUCKET,
+            Bucket: config.BUCKET,
             Key: filename,
             Body: data,
         };
@@ -22,7 +22,7 @@ class S3Service {
 
     static getFile(name, optParams) {
         let params = {
-            Bucket: BUCKET,
+            Bucket: config.BUCKET,
             Key: name
         };
         if(optParams) {
@@ -32,7 +32,7 @@ class S3Service {
     }
 
     static getUrl(filename) {
-        return s3.getSignedUrl('getObject', { Bucket: BUCKET, Key: filename });
+        return s3.getSignedUrl('getObject', { Bucket: config.BUCKET, Key: filename });
     }
 }
 
