@@ -34,8 +34,8 @@ class ImageOptionsValidator {
         let imageType = 'svg';
         if(parts[0] == 'zip')
             return imageType;
-        //if(utils.isEnumValue(Formats, parts[0]))
-        //    return parts[0];
+        if(utils.isEnumValue(Formats, parts[0]))
+            return parts[0];
         return imageType;
     }
 

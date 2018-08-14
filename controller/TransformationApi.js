@@ -1,5 +1,7 @@
 const InFormats = require('../model/EFileFormats');
+const OutFormats = require('./EResFileFormats');
 const ConvOpt = require('./EConversionOptions');
+const TranscoderOpt = require('./ETranscoderOptions');
 const express = require('express');
 const zipService = require('../services/ZipService');
 const s3Service = require('../services/S3Service');
@@ -66,34 +68,43 @@ module.exports = function (documentCtrl, comicGenerator) {
      */
     router.get('/image/:name/:mode/:format/:act?', function(req, res) {
         let parameter;
-        let key;
-        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
+        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => { //Validating parameters
             parameter = params;
             if(parameter.store)
                 return axios.get(config.STORE_URL + 'documents/' + parameter.name + '.json');
-            else
-                return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
+            return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
-            let load = file.Body ? file.Body.toString : file.data;
+            console.log('Loading file...');                                                                //Getting file from s3
+            let load = file.Body ? file.Body.toString() : file.data;
             return documentCtrl.parseProvDocument(load, InFormats.JSON);
-        }).then(doc => {
+        }).then(doc => {                                                                                        //Parsing document to JS Object
+            console.log('Parsing doc...');
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
                 return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
             }
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
-        }).then(comicResult => {
-            if(parameter.mode == ConvOpt.ALL_FRAMES) {
-                return zipService.comicFramesToZip(comicResult,  parameter);
-            } else if(parameter.mode == ConvOpt.ALL_STRIPES) {
-                return zipService.comicStripesToZip(comicResult, parameter);
-            } else  {
-                return Promise.resolve(comicResult.data);
+        }).then(comicResult => {                                                                     //Generate SVG image
+            if(parameter.mode == ConvOpt.ALL_FRAMES || parameter.mode == ConvOpt.ALL_STRIPES) {
+                let svgPayload;
+                if(parameter.mode == ConvOpt.ALL_FRAMES) {
+                    svgPayload = comicResult.map(elm => `${elm.data}`).reduce((flat, cur) => flat.concat(cur));
+                    //console.log('Payload: ', svgPayload);
+                }     
+                svgPayload = comicResult.map(elm => `${elm.data}`);
+                console.log('Payload: ', svgPayload);
+                return s3Service.invokeLambda(svgPayload, parameter.imageType, TranscoderOpt.MULTI_IMAGE); 
             }
-        }).then(result => {
-            key = parameter.name + '.' + parameter.imageType;
-            return s3Service.uploadFile(result, key);
-        }).then(uploadRes => {
-            return res.send({ msg: 'Here is your converted document.', name: key, url: s3Service.getUrl(key), serverResponse: uploadRes });
+            return s3Service.invokeLambda(comicResult.data, parameter.imageType, TranscoderOpt.SINGLE_IMAGE);
+        }).then(tcRes => {
+            console.log('TC result...');
+            let payload = JSON.parse(JSON.parse(tcRes.Payload).body);                                       //Transcoding SVG into different format
+            if(Array.isArray(payload.data.key)) {
+                let promises = payload.data.key.map(elm => s3Service.getUrl(elm));
+                return Promise.all(promises);
+            } 
+            return s3Service.getUrl(payload.data.key);
+        }).then(tcUrls => {                                                                                     //Getting transcoded images
+            return res.send({ msg: 'Here is your converted document.', url: tcUrls });
         }).catch(error => {
             if (error.response) { //Error from server
                 console.error(error.response.data);
@@ -102,10 +113,9 @@ module.exports = function (documentCtrl, comicGenerator) {
             } else if (error.request) { // Error contacting server
                 console.error(error.request);
                 return res.status(500).send('ProvStore not reachable');
-            } else {
-                console.error('Generation error: ', error);
-                return res.status(500).send(error);
-            }
+            } 
+            console.error('Generation error: ', error);
+            return res.status(500).send(error);
         });
     });
 

@@ -5,6 +5,7 @@ provider:
   runtime: nodejs8.10
   stage: dev
   region: eu-central-1
+  timeout: 20
   iamRoleStatements:
     - Effect: "Allow"
       Action: 
@@ -18,6 +19,11 @@ provider:
         - "s3:PutBucketPolicy"
         - "s3:PutObject"
       Resource: "arn:aws:s3:::*"
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: "*"  
 
 # you can add packaging information here
 #package:
