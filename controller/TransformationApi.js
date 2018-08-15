@@ -80,8 +80,10 @@ module.exports = function (documentCtrl, comicGenerator) {
         }).then(doc => {                                                                                        //Parsing document to JS Object
             console.log('Parsing doc...');
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
+                if(parameter.activity < 0 || parameter.activity >= doc.activities.length) throw new Error('Activity out of Bounds Error (<= 0 or > #of stripes)');
                 return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
             }
+            //console.log('Pre-Generation: ', parameter.mode, doc);
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
         }).then(comicResult => {                                                                     //Generate SVG image
             if(parameter.mode == ConvOpt.ALL_FRAMES || parameter.mode == ConvOpt.ALL_STRIPES) {
@@ -115,7 +117,7 @@ module.exports = function (documentCtrl, comicGenerator) {
                 return res.status(500).send('ProvStore not reachable');
             } 
             console.error('Generation error: ', error);
-            return res.status(500).send(error);
+            return res.status(500).send(error.message);
         });
     });
 
