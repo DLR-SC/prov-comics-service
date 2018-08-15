@@ -1,14 +1,13 @@
 const InFormats = require('../model/EFileFormats');
 const OutFormats = require('./EResFileFormats');
 const ConvOpt = require('./EConversionOptions');
+const TranscoderOpt = require('./ETranscoderOptions');
 const express = require('express');
 const zipService = require('../services/ZipService');
-const convertService = require('../services/ConvertService');
 const s3Service = require('../services/S3Service');
 const imageVal = require('./validator/ImageOptionsValidator');
-
-const SVG_SIZE = 500;
-const PROV_STORE_BASE_URL = 'https://provenance.ecs.soton.ac.uk/store/api/v0/';
+const config = require('../config/config');
+const axios = require('axios');
 
 module.exports = function (documentCtrl, comicGenerator) {
     const router = express.Router();
@@ -24,7 +23,7 @@ module.exports = function (documentCtrl, comicGenerator) {
         if(req.method == 'POST' && !req.body.format)
             req.body.format = 'png';
         if(req.method == 'POST' && !req.body.size)
-            req.body.size = SVG_SIZE;
+            req.body.size = config.COMIC_DEFAULT_SIZE;
 
         next();
     });
@@ -68,43 +67,57 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiError GenerationError ProvDocument could not be created, converted or send
      */
     router.get('/image/:name/:mode/:format/:act?', function(req, res) {
-        console.log('Node version: ', process.versions);
-
         let parameter;
-        let key;
-        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {
+        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => { //Validating parameters
             parameter = params;
-            console.log(parameter, parameter.activity);
+            if(parameter.store)
+                return axios.get(config.STORE_URL + 'documents/' + parameter.name + '.json');
             return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
-            //console.log(file);
-            return documentCtrl.parseProvDocument(file.Body.toString(), InFormats.JSON);
-        }).then(doc => {
-            console.log(parameter.mode, ConvOpt.SINGLE_STRIPE);
+            console.log('Loading file...');                                                                //Getting file from s3
+            let load = file.Body ? file.Body.toString() : file.data;
+            return documentCtrl.parseProvDocument(load, InFormats.JSON);
+        }).then(doc => {                                                                                        //Parsing document to JS Object
+            console.log('Parsing doc...');
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
-                console.log(parameter.mode, doc);
+                if(parameter.activity < 0 || parameter.activity >= doc.activities.length) throw new Error('Activity out of Bounds Error (<= 0 or > #of stripes)');
                 return comicGenerator[parameter.mode](doc.activities[parameter.activity], parameter.frameSize);
             }
+            //console.log('Pre-Generation: ', parameter.mode, doc);
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
-        }).then(comicResult => {
-            if(parameter.mode == ConvOpt.ALL_FRAMES) {
-                return zipService.comicFramesToZip(comicResult,  parameter);
-            } else if(parameter.mode == ConvOpt.ALL_STRIPES) {
-                return zipService.comicStripesToZip(comicResult, parameter);
-            } else if(parameter.imageType == OutFormats.SVG) {
-                return Promise.resolve(comicResult.data);
-            } else {
-                return convertService.convertSvgString(comicResult, parameter.imageType);
+        }).then(comicResult => {                                                                     //Generate SVG image
+            if(parameter.mode == ConvOpt.ALL_FRAMES || parameter.mode == ConvOpt.ALL_STRIPES) {
+                let svgPayload;
+                if(parameter.mode == ConvOpt.ALL_FRAMES) {
+                    svgPayload = comicResult.map(elm => `${elm.data}`).reduce((flat, cur) => flat.concat(cur));
+                    //console.log('Payload: ', svgPayload);
+                }     
+                svgPayload = comicResult.map(elm => `${elm.data}`);
+                console.log('Payload: ', svgPayload);
+                return s3Service.invokeLambda(svgPayload, parameter.imageType, TranscoderOpt.MULTI_IMAGE); 
             }
-        }).then(result => {
-            key = parameter.name + '.' + parameter.imageType;
-            //console.log('Res: ', result)
-            return s3Service.uploadFile(result, key);
-        }).then(uploadRes => {
-            return res.send({ msg: 'Here is your converted document.', name: key, url: s3Service.getUrl(key), serverResponse: uploadRes });
-        }).catch(err => {
-            console.error('Generation error: ', err);
-            return res.status(500).send(err);
+            return s3Service.invokeLambda(comicResult.data, parameter.imageType, TranscoderOpt.SINGLE_IMAGE);
+        }).then(tcRes => {
+            console.log('TC result...');
+            let payload = JSON.parse(JSON.parse(tcRes.Payload).body);                                       //Transcoding SVG into different format
+            if(Array.isArray(payload.data.key)) {
+                let promises = payload.data.key.map(elm => s3Service.getUrl(elm));
+                return Promise.all(promises);
+            } 
+            return s3Service.getUrl(payload.data.key);
+        }).then(tcUrls => {                                                                                     //Getting transcoded images
+            return res.send({ msg: 'Here is your converted document.', url: tcUrls });
+        }).catch(error => {
+            if (error.response) { //Error from server
+                console.error(error.response.data);
+                console.error(error.response.headers);
+                return res.status(error.response.status).send(error.response.data);
+            } else if (error.request) { // Error contacting server
+                console.error(error.request);
+                return res.status(500).send('ProvStore not reachable');
+            } 
+            console.error('Generation error: ', error);
+            return res.status(500).send(error.message);
         });
     });
 

@@ -1,5 +1,4 @@
 const AGenerator = require('../ARaphaelGenerator');
-const Builder = require('../ElementBuilder');
 const moment = require('moment');
 const Device = require('../Device');
 

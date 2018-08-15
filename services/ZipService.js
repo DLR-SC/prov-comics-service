@@ -31,7 +31,6 @@ class ZipService {
             let stripe = stripes[stripeKey];
             let filename = `${parseInt(stripeKey) + 1}_frame_${stripe.name.split(':')[1]}.svg`;
             zip.file(filename, stripe.data);
-            
         }
         parameter.imageType = Format.ZIP;
         const options = { base64: true, compression:'STORE' };

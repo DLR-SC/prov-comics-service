@@ -77,6 +77,13 @@ class SVGGenerator {
         return this.generateSequence(activity, size, generators);
     }
 
+    static generateSensingSequence(activity, size, stripe) {
+        let generators = this.getGenerators(ActivityType.SENSING, activity, size);
+        if(stripe)
+            return this.generateStripe(activity, size, generators);
+        return this.generateSequence(activity, size, generators);
+    }
+
     static generateSequence(activity, size, generatorList) {
         let sequence = {
             name: activity.id,

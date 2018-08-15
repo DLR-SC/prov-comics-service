@@ -2,6 +2,8 @@ const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const tls = require('tls');
+tls.DEFAULT_ECDH_CURVE = 'auto';
 //const AWS = require('aws-sdk');
 
 //Express setup
@@ -14,8 +16,8 @@ const ComicGenerator = require('./services/ImageGeneration/ComicGenerator');
 
 // Controller
 const ComicCtrl = require('./controller/ComicApi')(DocumentCtrl, ComicGenerator);
-const DocCtrl = require('./controller/ConverterApi')(DocumentCtrl, ComicGenerator);
+const TransformationCtrl = require('./controller/TransformationApi')(DocumentCtrl, ComicGenerator);
 app.use('/api/v1/comic', ComicCtrl);
-app.use('/api/v1/doc', DocCtrl);
+app.use('/api/v1/transformation', TransformationCtrl);
 
 module.exports.handler = serverless(app);
