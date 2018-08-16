@@ -1,4 +1,4 @@
-service: comic
+service: prov-comics-service
 
 provider:
   name: aws
@@ -38,7 +38,7 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  app:
+  api:
     handler: index.handler
     description: Index file for the comic REST API
     events:

@@ -11,10 +11,11 @@ const request = require('request');
 
 chai.use(chaiHttp);
 
-const BASE_URL = 'https://qnt4d9vq0a.execute-api.eu-central-1.amazonaws.com/dev/api/v1/transformation/';
+const DEPLOY_ID = 'au9tkaovje';
+const BASE_URL = 'https://' + DEPLOY_ID +'.execute-api.eu-central-1.amazonaws.com/dev/api/v1/transformation/';
 
 describe('test transformation api document', () => {
-    
+
     //Testing add/ route
     describe('/add route', () => {
         it('adding document to S3 returns status 200', (done) => {
