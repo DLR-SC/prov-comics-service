@@ -6,6 +6,9 @@ provider:
   stage: dev
   region: eu-central-1
   timeout: 20
+  package:
+    exclude:
+      - test/**
   iamRoleStatements:
     - Effect: "Allow"
       Action: 

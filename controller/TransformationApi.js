@@ -58,7 +58,7 @@ module.exports = function (documentCtrl, comicGenerator) {
      * @apiGroup Doc
      * 
      * @apiParam {String} name          Name of the ProvDocument, is returned with the UploadDocument function
-     * @apiParam {String} mode          Defines which action will be performed on the document ('createComicFrames', 'createAllStripes', 'createStripe', 'createComic')
+     * @apiParam {String} mode          Defines which action will be performed on the document ('createAllFrames', 'createAllStripes', 'createStripe', 'createComic')
      * @apiParam {String} format        Image Type and Size, has to be given in this format: <Type>.<Size>; <Type> can be png, svg or jpg; <Size> can be any integer numnber
      * @apiParam {Number} [act]         If you used the mode 'createStripe' this specifies the activity id
      * 
@@ -68,16 +68,16 @@ module.exports = function (documentCtrl, comicGenerator) {
      */
     router.get('/image/:name/:mode/:format/:act?', function(req, res) {
         let parameter;
-        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => { //Validating parameters
+        imageVal.validate(req.params.name, req.params.mode, req.params.format, req.params.act).then(params => {     //Validating parameters
             parameter = params;
             if(parameter.store)
                 return axios.get(config.STORE_URL + 'documents/' + parameter.name + '.json');
             return s3Service.getFile(params.name, { ResponseContentType: 'application/json' });
         }).then(file => {
-            console.log('Loading file...');                                                                //Getting file from s3
+            console.log('Loading file...');                                                                         //Getting file from s3
             let load = file.Body ? file.Body.toString() : file.data;
             return documentCtrl.parseProvDocument(load, InFormats.JSON);
-        }).then(doc => {                                                                                        //Parsing document to JS Object
+        }).then(doc => {                                                                                            //Parsing document to JS Object
             console.log('Parsing doc...');
             if(parameter.mode == ConvOpt.SINGLE_STRIPE) {
                 if(parameter.activity < 0 || parameter.activity >= doc.activities.length) throw new Error('Activity out of Bounds Error (<= 0 or > #of stripes)');
@@ -85,29 +85,28 @@ module.exports = function (documentCtrl, comicGenerator) {
             }
             //console.log('Pre-Generation: ', parameter.mode, doc);
             return comicGenerator[parameter.mode](doc, parameter.frameSize);
-        }).then(comicResult => {                                                                     //Generate SVG image
+        }).then(comicResult => {                                                                                    //Generate SVG image
             if(parameter.mode == ConvOpt.ALL_FRAMES || parameter.mode == ConvOpt.ALL_STRIPES) {
                 let svgPayload;
                 if(parameter.mode == ConvOpt.ALL_FRAMES) {
                     svgPayload = comicResult.map(elm => `${elm.data}`).reduce((flat, cur) => flat.concat(cur));
-                    //console.log('Payload: ', svgPayload);
                 }     
                 svgPayload = comicResult.map(elm => `${elm.data}`);
                 console.log('Payload: ', svgPayload);
                 return s3Service.invokeLambda(svgPayload, parameter.imageType, TranscoderOpt.MULTI_IMAGE); 
             }
             return s3Service.invokeLambda(comicResult.data, parameter.imageType, TranscoderOpt.SINGLE_IMAGE);
-        }).then(tcRes => {
+        }).then(tcRes => {                                                                                          //Transcoding SVG into different format
             console.log('TC result...');
-            let payload = JSON.parse(JSON.parse(tcRes.Payload).body);                                       //Transcoding SVG into different format
+            let payload = JSON.parse(JSON.parse(tcRes.Payload).body);                                      
             if(Array.isArray(payload.data.key)) {
                 let promises = payload.data.key.map(elm => s3Service.getUrl(elm));
                 return Promise.all(promises);
             } 
             return s3Service.getUrl(payload.data.key);
-        }).then(tcUrls => {                                                                                     //Getting transcoded images
+        }).then(tcUrls => {                                                                                         //Getting transcoded images
             return res.send({ msg: 'Here is your converted document.', url: tcUrls });
-        }).catch(error => {
+        }).catch(error => {                                                                                         //Error handling
             if (error.response) { //Error from server
                 console.error(error.response.data);
                 console.error(error.response.headers);

@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "serve": "sls offline start"
+    "test": "node node_modules/mocha/bin/mocha -R spec --timeout 20000"
   },
   "repository": {
     "type": "git",
@@ -29,14 +29,18 @@
     "node-zip": "^1.1.1",
     "path": "^0.12.7",
     "raphael": "^2.2.7",
+    "request": "^2.88.0",
     "serverless": "^1.26.1",
     "serverless-http": "^1.5.3",
     "shortid": "^2.2.8"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "eslint": "^4.16.0",
     "http": "0.0.0",
-    "serverless-offline": "^3.23.0",
-    "eslint": "^4.16.0"
+    "mocha": "^5.2.0",
+    "serverless-offline": "^3.23.0"
   },
   "apidoc": {
     "title": "Documentation for REST API",
