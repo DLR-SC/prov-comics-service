@@ -1,5 +1,5 @@
 const resFileFormat = {
-//    PNG: 'png',
+    PNG: 'png',
     JPG: 'jpg',
     SVG: 'svg',
     ZIP: 'zip'
