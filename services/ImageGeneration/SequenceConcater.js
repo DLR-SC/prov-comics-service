@@ -1,5 +1,6 @@
 const Setup = require('./RaphaelSetup');
 const shortid = require('shortid');
+const config = require('../../config/config');
 
 function copyElm(orig, dest, elm, x, y) {
     let type = elm.type;
@@ -29,7 +30,7 @@ class SequenceConcater {
         this.id = shortid.generate();
         
         this.paper = Setup.createNewPaper(this.id, size * this.height, size * this.width);
-        this.paper.setViewBox(0, 0, 500 * this.width, 500 * this.height);
+        this.paper.setViewBox(0, 0, config.COMIC_DEFAULT_SIZE * this.width, config.COMIC_DEFAULT_SIZE * this.height);
     }
 	
     generate() {
@@ -37,11 +38,11 @@ class SequenceConcater {
         let yIdx = 0;
         for(let seqId in this.generators) {
             let seq = this.generators[seqId];
-            let y = this.size * yIdx;
+            let y = config.COMIC_DEFAULT_SIZE * yIdx;
             xIdx = 0;
             for(let frame of seq) {
                 //console.log(`Size: (${this.width * this.size}|${this.height * this.size}), Pos: (${this.size * xIdx}|${this.size * yIdx})`);
-                let x = this.size * xIdx;
+                let x = config.COMIC_DEFAULT_SIZE * xIdx;
                 frame.paper.forEach(elm => {
                     copyElm(frame.paper, this.paper, elm, x, y);
                 });
