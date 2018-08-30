@@ -115,6 +115,47 @@ describe('test transformation api document', () => {
                 done();
             });
         });
+
+        it('createAllStripes PNG', (done) => {
+            request(BASE_URL + 'image/' + provDocName + '/createAllStripes/png.250', { method: 'GET', headers: { 'Content-Type': 'application/json' } }, (err, res, data) => {
+                dataObj = JSON.parse(data);
+                expect(res.statusCode, "status code").to.equal(200);
+                expect(dataObj).to.have.property('url');
+                expect(data.indexOf('png') > -1).to.be.true;
+                done();
+            });
+        });
+
+        it('createAllFrames PNG', (done) => {
+            request(BASE_URL + 'image/' + provDocName + '/createAllFrames/png.250', { method: 'GET', headers: { 'Content-Type': 'application/json' } }, (err, res, data) => {
+                dataObj = JSON.parse(data);
+                expect(res.statusCode, "status code").to.equal(200);
+                expect(dataObj).to.have.property('url');
+                expect(dataObj.url).to.be.an.instanceOf(Array);
+                expect(data.indexOf('png') > -1).to.be.true;
+                done();
+            });
+        });
+
+        it('createComic PNG', (done) => {
+            request(BASE_URL + 'image/' + provDocName + '/createComic/png.250', { method: 'GET', headers: { 'Content-Type': 'application/json' } }, (err, res, data) => {
+                dataObj = JSON.parse(data);
+                expect(res.statusCode, "status code").to.equal(200);
+                expect(dataObj).to.have.property('url');
+                expect(data.indexOf('png') > -1).to.be.true;
+                done();
+            });
+        });
+
+        it('get document from provstore', (done) => {
+            request(BASE_URL + 'image/provstore_10/createComic/jpg.500', { method: 'GET', headers: { 'Content-Type': 'application/json' } }, (err, res, data) => {
+                dataObj = JSON.parse(data);
+                expect(res.statusCode, "status code").to.equal(200);
+                expect(dataObj).to.have.property('url');
+                expect(data.indexOf('jpg') > -1).to.be.true;
+                done();
+            });
+        });
       
     });
 });
