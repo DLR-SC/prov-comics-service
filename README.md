@@ -21,6 +21,7 @@ Documents can be send via a REST-Interface or they can be used from the open sou
 - AWS Account
 
 ### Setup
+0. check, that the services is not already installed and that there exists no S3 bucket with the name **prov-comics-storage** 
 1. install serverless
     - **npm install -g serverless**
     - Longer version: https://serverless.com/framework/docs/providers/aws/guide/installation/
@@ -35,6 +36,11 @@ Documents can be send via a REST-Interface or they can be used from the open sou
     - the main prov-comics-service needs a second java based lamabda function to convert the image formats from SVG to other file types. You get it from: git clone https://github.com/DLR-SC/prov-svg-transcoder.git
     - Switch to the downloaded folder and run **serverless deploy** here, too
 5. Your service should now be able to be contacted from the address that serverless printed you prompt in step 3)
+
+## Unistall Service
+- Go to your AWS Console and delete the s3 bucket **prov-comic-storage**
+- Run **serverless remove** in this folder
+- Run **serverless remove** in the root directory of the *prov-svg-transcoder* service
 
 ## Testing 
 - Get the deploy id

@@ -11,7 +11,7 @@ const request = require('request');
 
 chai.use(chaiHttp);
 
-const DEPLOY_ID = '91r05ah9pl';
+const DEPLOY_ID = '26sngzctlc';
 const BASE_URL = 'https://' + DEPLOY_ID +'.execute-api.eu-central-1.amazonaws.com/dev/api/v1/transformation/';
 
 describe('test transformation api document', () => {
