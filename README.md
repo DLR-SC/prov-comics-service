@@ -34,7 +34,7 @@ Documents can be send via a REST-Interface or they can be used from the open sou
     - Wait for serverless to upload the application
 4. Deploy image conversion service
     - the main prov-comics-service needs a second java based lamabda function to convert the image formats from SVG to other file types. You get it from: git clone https://github.com/DLR-SC/prov-svg-transcoder.git
-    - Switch to the downloaded folder and run **serverless deploy** here, too
+    - Switch to the downloaded folder and run **mvn clean intall && serverless deploy** here, too
 5. Your service should now be able to be contacted from the address that serverless printed you prompt in step 3)
 
 ## Unistall Service
